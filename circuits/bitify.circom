@@ -79,7 +79,7 @@ function nbits(a) {
 
 
 /*
-*** Num2Bits(n): template that transform an input into its binary representation using n bits
+*** Num2Bits(n): template that transforms an input into its binary representation using n bits
         - Inputs: in -> field value
         - Output: out[n] -> binary representation of in using n bits
                             satisfies tag binary
@@ -143,7 +143,7 @@ template Num2Bits_strict() {
 
 /*
 
-*** Num2Bits(n): template that transform an input of n bits representing a value x in binary into the decimal representation of x
+*** Bits2Num(n): template that transforms an input of n bits representing a value x in binary into the decimal representation of x
         - Inputs: in[n] -> binary representation of out using n bits
                            satisfies tag binary
         - Output: out -> value represented by the input
@@ -173,7 +173,7 @@ template Bits2Num(n) {
 
 ------> equivalent to Bits2Num(maxbits() + 1)(in)
 
-*** Bits2Num_strict(): template that transform an input of maxbits() + 1 bits representing a value x in binary into the decimal representation of x
+*** Bits2Num_strict(): template that transforms an input of maxbits() + 1 bits representing a value x in binary into the decimal representation of x
         - Inputs: in[n] -> binary representation of out using maxbits() + 1 bits
                            satisfies tag binary
         - Output: out -> value represented by the input
@@ -190,10 +190,7 @@ template Bits2Num_strict() {
     out.maxbit = maxbits() + 1;
     
     component b2n = Bits2Num(maxbits() + 1);
-    for (var i=0; i<maxbits() + 1; i++) {
-        in[i] ==> b2n.in[i];
-    }
-
+    b2n.in <== in;
     b2n.out ==> out;
 }
 

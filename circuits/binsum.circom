@@ -45,18 +45,68 @@ To waranty binary outputs:
 
  */
 
+ pragma circom 2.1.5;
+
+include "bitify.circom";
+include "tags-specifications.circom";
+
+// The templates and functions in this file are general and work for any prime field
+
+// To consult the tags specifications check tags-specifications.circom
 
 /*
-    This function calculates the number of extra bits in the output to do the full sum.
- */
- pragma circom 2.0.0;
 
+*** BinSum(n, ops): template that receives ops inputs of n bits representing values in[0], ..., in[ops-1] in binary and returns n + nbits(ops) bits representing the result of in[0] + ... + in[ops - 1]
+        - Inputs: in[ops][n] -> ops arrays representing the values in[0], ... , in[ops - 1] using n bits
+                           satisfies tag binary
+        - Output: out[n + nbits(ops - 1)] -> result of in[0] + ... + in[ops - 1] expressed using n + nbits(ops) bits
+                         satisfies tag binary
+         
+    Example: BinSum(3, 3)([[1, 0, 1], [1, 1, 1], [0, 0, 1]]) = [0, 0, 0, 0, 1]
+    
+    
+    Main Constraint:
+        in[0][0]     * 2^0  +  in[0][1]     * 2^1  + ..... + in[0][n-1]    * 2^(n-1)  +
+        + in[1][0]     * 2^0  +  in[1][1]     * 2^1  + ..... + in[1][n-1]    * 2^(n-1)  +
+        + ..
+        + in[ops-1][0] * 2^0  +  in[ops-1][1] * 2^1  + ..... + in[ops-1][n-1] * 2^(n-1)  +
+        ===
+        out[0] * 2^0  + out[1] * 2^1 +   + out[n+e-1] *2(n+e-1)
+
+    To waranty binary outputs:
+
+        out[0]     * (out[0] - 1) === 0
+        out[1]     * (out[0] - 1) === 0
+        .
+        .
+        .  
+        out[n+e-1] * (out[n+e-1] - 1) == 0
+          
+*/
 
 
 template BinSum(n, ops) {
-    var nout = nbits((2**n -1)*ops);
-    signal input in[ops][n];
-    signal output out[nout];
+    var nout = n + nbits(ops-1);
+    signal input {binary} in[ops][n];
+    signal output {binary} out[nout];
+    
+    var result = 0;
+    
+    for (var i = 0; i < ops; i++){
+        var aux = Bits2Num(n)(in[i]);
+        result = result + aux;
+    }
+
+    component n2b = Num2Bits(nout);
+    n2b.in <== result;
+    out <== n2b.out;
+}
+
+
+template BinSum_old(n, ops) {
+    var nout = n + nbits(ops-1);
+    signal input {binary} in[ops][n];
+    signal output{binary} out[nout];
 
     var lin = 0;
     var lout = 0;

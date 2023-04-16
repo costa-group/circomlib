@@ -1,7 +1,7 @@
 pragma circom 2.0.0;
 
 include "../../circuits/bitify.circom";
-include "../../circuits/binsub.circom";
+include "../../circuits/binsum.circom";
 
 template A() {
     signal input a; //private
@@ -12,8 +12,8 @@ template A() {
 
     component n2ba = Num2Bits(16);
     component n2bb = Num2Bits(16);
-    component sub = BinSub(16);
-    component b2n = Bits2Num(16);
+    component sub = BinSum(16, 2);
+    component b2n = Bits2Num(17);
 
     n2ba.in <== a;
     n2bb.in <== b;
