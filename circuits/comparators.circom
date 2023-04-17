@@ -23,7 +23,7 @@ include "binsum.circom";
 
 template IsZero() {
     signal input in;
-    signal output out;
+    signal output {binary} out;
 
     signal inv;
 
@@ -36,7 +36,7 @@ template IsZero() {
 
 template IsEqual() {
     signal input in[2];
-    signal output out;
+    signal output {binary} out;
 
     component isz = IsZero();
 

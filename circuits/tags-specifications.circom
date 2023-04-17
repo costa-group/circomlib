@@ -1,3 +1,5 @@
+pragma circom 2.1.5;
+
 /*
 
 Used tags:

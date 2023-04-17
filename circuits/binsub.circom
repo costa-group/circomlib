@@ -67,9 +67,10 @@ template BinSub(n) {
 
     component n2b = Num2Bits(n+1);
     n2b.in <== 2 ** n + b2n1.out - b2n2.out;
-    for(var i = 0; i < n; i++){ // if we want to return if in[1]
+    for(var i = 0; i < n; i++){
         out[i] <== n2b.out[i];
     }
+    _ <== n2b.out[n]; // if we want to return if in[0] >= in[1]
 
 }
 
