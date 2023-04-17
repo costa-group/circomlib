@@ -36,31 +36,30 @@
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
 
-// --> Assignation without constraint
-// <-- Assignation without constraint
-// === Constraint
-// <== Assignation with constraint
-// ==> Assignation with constraint
-// All variables are members of the field F[p]
 // https://github.com/zcash-hackworks/sapling-crypto
 // https://github.com/ebfull/bellman
 
-/*
-function log2(a) {
-    if (a==0) {
-        return 0;
-    }
-    let n = 1;
-    let r = 1;
-    while (n<a) {
-        r++;
-        n *= 2;
-    }
-    return r;
-}
-*/
 
-pragma circom 2.0.0;
+pragma circom 2.1.5;
+
+include "tags-specifications.circom";
+include "comparators.circom";
+
+// The templates and functions in this file are general and work for any prime field
+
+// To consult the tags specifications check tags-specifications.circom
+
+/*
+
+*** EscalarProduct(n): template that implements the escalar product of two vectors of n elements 
+
+        - Inputs: in1[n] -> array of n field elements
+                  in2[n] -> array of n field elements
+        - Output: out -> field element, escalar product of in1 and in2: out = in1[0] * in2[0] + ... + in1[n-1] * in2[n-1]
+        
+    Example: EscalarProduct(3)([1, 5, 3], [2, 0, 1]) = 5
+
+ */
 
 template EscalarProduct(w) {
     signal input in1[w];
@@ -75,10 +74,50 @@ template EscalarProduct(w) {
     out <== lc;
 }
 
+/*
+
+*** Decoder(n): template that receives an input and returns a vector out of n bits such that out[inp] = 1 and the rest of the elements are 0
+        - Inputs: inp -> field value
+        - Output: out[n] -> array of n binary values, for i in 0..n: out[i] = 1 if i = inp, else out[i] = 0 
+                            satisfies tag binary
+                  success -> binary value, success = w < inp
+                             satisfies tag binary   
+        
+    Example: Decoder(3)(2) = ([0, 0, 1], 1), Decoder(3)(4) = ([0, 0, 0], 0)
+
+ */
+
 template Decoder(w) {
     signal input inp;
-    signal output out[w];
-    signal output success;
+    signal output {binary} out[w];
+    signal output {binary} success;
+    var lc=0;
+    
+    component checkZero[w];
+    for (var i=0; i<w; i++) {
+        checkZero[i] = IsZero();
+        checkZero[i].in <== inp - i;
+        out[i] <== checkZero[i].out;
+        lc = lc + out[i];
+    }
+    lc ==> success;
+}
+
+/*
+
+*** Decoder_strict(n): template that receives an input and returns a vector out of n bits such that out[inp] = 1 and the rest of the elements are 0. In case inp >= n the template fails and does not accept any witness
+        - Inputs: inp -> field value
+        - Output: out[n] -> array of n binary values, for i in 0..n: out[i] = 1 if i = inp, else out[i] = 0 
+                            satisfies tag binary
+        
+    Example: Decoder_strict(3)(2) = [0, 0, 1], Decoder_strict(2)(4) no solution
+    Note: in case inp >= w the R1CS system of constraints does not have any solution
+
+ */
+
+template Decoder_strict(w) {
+    signal input inp;
+    signal output {binary} out[w];
     var lc=0;
 
     for (var i=0; i<w; i++) {
@@ -87,29 +126,41 @@ template Decoder(w) {
         lc = lc + out[i];
     }
 
-    lc ==> success;
-    success * (success -1) === 0;
+    lc === 1;
 }
 
+/*
+
+*** Multiplexer(wIn, nIn): template that implements a multiplexer nIn-to-1 between two inputs of wIn elements
+    - If sel == 0 then out = inp[0]
+    - If sel == 1 then out = inp[1]
+    ...
+    - If sel == nIn - 1 then out = inp[nIn - 1]
+
+        - Inputs: sel -> field value
+                  inp[nIn][wIn] -> nIn arrays of wIn elements that correspond to the inputs of the mux: inp[0] => first input, inp[1] => second input, ...
+        - Output: out[n] -> array of n elements, it takes the value inp[0] if sel == 0, inp[1] if sel == 1, ..., inp[nIn-1] if sel == nIn - 1 
+        
+    Example: Multiplexer(2, 3)([[1, 2], [2, 3], [2, 4]], 2) = [2, 4]
+
+ */
 
 template Multiplexer(wIn, nIn) {
     signal input inp[nIn][wIn];
     signal input sel;
     signal output out[wIn];
-    component dec = Decoder(nIn);
+    
+    component dec = Decoder_strict(nIn);
+    dec.inp <== sel;   
+    
     component ep[wIn];
 
-    for (var k=0; k<wIn; k++) {
-        ep[k] = EscalarProduct(nIn);
-    }
-
-    sel ==> dec.inp;
     for (var j=0; j<wIn; j++) {
+        ep[j] = EscalarProduct(nIn);
         for (var k=0; k<nIn; k++) {
             inp[k][j] ==> ep[j].in1[k];
-            dec.out[k] ==> ep[j].in2[k];
         }
+        ep[j].in2 <== dec.out;
         ep[j].out ==> out[j];
     }
-    dec.success === 1;
 }

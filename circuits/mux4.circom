@@ -16,11 +16,38 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
-pragma circom 2.0.0;
+pragma circom 2.1.5;
+
+include "tags-specifications.circom";
+
+// The templates and functions in this file are general and work for any prime field
+
+// To consult the tags specifications check tags-specifications.circom
+
+/*
+
+*** MultiMux4(n): template that implements a multiplexer 16-to-1 between 16 inputs of n elements
+    - If s == 0 then out = c[0]
+    - If s == 1 then out = c[1]
+       .
+       .
+       .
+       
+    - If s == 14 then out = c[14]
+    - If s == 15 then out = c[15]
+    
+        - Inputs: s[4] -> binary values
+                          satisfies tag binary
+                  c[n][16] -> 16 arrays of n elements that correspond to the inputs of the mux: c[i][0] => first input, c[i][1] => second input, ... 
+        - Output: out[n] -> array of n elements, it takes the value c[i][0] if s == [0, 0, 0, 0], c[i][1] if s == [1, 0, 0, 0], ... , c[i][15] if s == [1, 1, 1, 1]
+        
+    Example: MultiMux4(2)([[1, 2, 4, 1, 1, 6, 7, 3, 1, 2, 4, 1, 1, 6, 7, 3], [3, 1, 3, 1, 4, 6, 6, 2, 1, 2, 4, 1, 1, 6, 7, 3]], [1, 0, 1, 0]) = [6, 6]
+
+ */
 
 template MultiMux4(n) {
     signal input c[n][16];  // Constants
-    signal input s[4];   // Selector
+    signal input {binary} s[4];   // Selector
     signal output out[n];
 
     signal a3210[n];
@@ -99,10 +126,31 @@ template MultiMux4(n) {
     }
 }
 
+/*
+
+*** Mux4(): template that implements a multiplexer 16-to-1 
+    - If s == 0 then out = c[0]
+    - If s == 1 then out = c[1]
+      . 
+      .
+      .
+      
+    - If s == 14 then out = c[14]
+    - If s == 15 then out = c[15]
+
+        - Inputs: s[4] -> binary values
+                          requires tag binary
+                  c[16] -> 16 elements that correspond to the inputs of the mux: c[0] => first input, c[1] => second input, ...
+        - Output: out -> field element, it takes the value c[0] if s == [0, 0, 0, 0], c[1] if s == [1, 0, 0, 0], . . ., c[15] if s == [1, 1, 1, 1] 
+        
+    Example: Mux3()([1, 5, 4, 2, 6, 3, 1, 5, 1, 5, 4, 2, 6, 3, 1, 5], [0, 0, 1, 1]) = 6
+
+ */
+
 template Mux4() {
     var i;
     signal input c[16];  // Constants
-    signal input s[4];   // Selector
+    signal input {binary} s[4];   // Selector
     signal output out;
 
     component mux = MultiMux4(1);
