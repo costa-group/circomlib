@@ -60,7 +60,7 @@ template XOR() {
 template AND() {
     signal input {binary} a;
     signal input {binary} b;
-    signal output {ninary} out;
+    signal output {binary} out;
 
     out <== a*b;
 }
