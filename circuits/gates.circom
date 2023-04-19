@@ -60,7 +60,7 @@ template XOR() {
 template AND() {
     signal input {binary} a;
     signal input {binary} b;
-    signal output {ninary} out;
+    signal output {binary} out;
 
     out <== a*b;
 }
@@ -135,9 +135,9 @@ template NAND() {
 */
 
 template NOR() {
-    signal input a;
-    signal input b;
-    signal output out;
+    signal input {binary} a;
+    signal input {binary} b;
+    signal output {binary} out;
 
     out <== a*b + 1 - a - b;
 }
