@@ -20,12 +20,29 @@
 /*
     Source: https://en.wikipedia.org/wiki/Montgomery_curve
 
+ */
+pragma circom 2.1.5;
+
+include "tags-specifications.circom";
+
+
+// The templates and functions in this file are general and work for any prime field
+
+// To consult the tags specifications check tags-specifications.circom
+
+
+/*
+*** Edwards2Montgomery(): template that receives an input in representing a point of an elliptic curve in Edwards form and returns the equivalent point in Montgomery form
+        - Inputs: in[2] -> array of 2 field values representing a point of the curve in Edwards form
+        - Outputs: out[2] -> array of 2 field values representing a point of the curve in Montgomery form
+         
+    Example: if we consider the input in = [u, v], then the circuit produces the following output [x, y]
+    
                 1 + y       1 + y
     [u, v] = [ -------  , ---------- ]
                 1 - y      (1 - y)x
-
- */
- pragma circom 2.0.0;
+    
+*/
 
 template Edwards2Montgomery() {
     signal input in[2];
@@ -39,13 +56,20 @@ template Edwards2Montgomery() {
     out[1] * in[0] === out[0];
 }
 
-/*
 
+/*
+*** Montgomery2Edwards(): template that receives an input in representing a point of an elliptic curve in Montgomery form and returns the equivalent point in Edwards form
+        - Inputs: in[2] -> array of 2 field values representing a point of the curve in Montgomery form
+        - Outputs: out[2] -> array of 2 field values representing a point of the curve in Edwards form
+         
+    Example: if we consider the input in = [x, y], then the circuit produces the following output [u, v]
+    
                 u    u - 1
     [x, y] = [ ---, ------- ]
                 v    u + 1
 
  */
+ 
 template Montgomery2Edwards() {
     signal input in[2];
     signal output out[2];
@@ -59,22 +83,12 @@ template Montgomery2Edwards() {
 
 
 /*
-             x2 - x1
-    lamda = ---------
-             y2 - y1
-
-                                                    x3 + A + x1 + x2
-    x3 = B * lamda^2 - A - x1 -x2    =>  lamda^2 = ------------------
-                                                         B
-
-    y3 = (2*x1 + x2 + A)*lamda - B*lamda^3 - y1  =>
-
-
-    =>  y3 = lamda * ( 2*x1 + x2 + A  - x3 - A - x1 - x2)  - y1 =>
-
-    =>  y3 = lamda * ( x1 - x3 ) - y1
-
-----------
+*** MontgomeryAdd(): template that receives two inputs in1, in2 representing points of an elliptic curve in Montgomery form and returns the addition of the points
+        - Inputs: in1[2] -> array of 2 field values representing a point of the curve in Montgomery form
+                  in2[2] -> array of 2 field values representing a point of the curve in Montgomery form
+        - Outputs: out[2] -> array of 2 field values representing the point in1 + in2 in Montgomery form
+         
+    Example: if we consider the inputs in1 = [x1, y1] and in2 = [x2, y2], then the circuit produces the following output [x3, y3]:
 
              y2 - y1
     lamda = ---------
@@ -106,7 +120,14 @@ template MontgomeryAdd() {
     out[1] <== lamda * (in1[0] - out[0]) - in1[1];
 }
 
+
 /*
+*** MontgomeryDouble(): template that receives an input in1 representing a point of an elliptic curve in Montgomery form and returns the point 2 * in
+        - Inputs: in[2] -> array of 2 field values representing a point of the curve in Montgomery form
+        - Outputs: out[2] -> array of 2 field values representing the point 2*in in Montgomery form
+         
+         
+    Example: if we consider the input in = [x1, y1], then the circuit produces the following output [x3, y3]:
 
     x1_2 = x1*x1
 
@@ -119,6 +140,7 @@ template MontgomeryAdd() {
     y3 = lamda * ( x1 - x3 ) - y1
 
  */
+ 
 template MontgomeryDouble() {
     signal input in[2];
     signal output out[2];

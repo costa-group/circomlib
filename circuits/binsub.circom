@@ -70,7 +70,7 @@ template BinSub(n) {
     for(var i = 0; i < n; i++){
         out[i] <== n2b.out[i];
     }
-    _ <== n2b.out[n]; // if we want to return if in[0] >= in[1]
+    _ <== n2b.out[n]; // if we want to return if in[0] >= in[1], value aux in the example
 
 }
 

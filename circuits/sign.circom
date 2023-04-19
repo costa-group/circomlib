@@ -16,21 +16,36 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
-pragma circom 2.0.0;
+pragma circom 2.1.5;
 
+include "bitify.circom";
 include "compconstant.circom";
+include "tags-specifications.circom";
+
+
+// The templates and functions in this file are general and work for any prime field
+
+// To consult the tags specifications check tags-specifications.circom
+
+
+/*
+*** Sign(): template that receives an input in representing a value in binary using maxbits() + 1 bits and checks if the value is positive or negative. We consider a number positive in case in <= p \ 2 and negative otherwise 
+        - Inputs: in[maxbits() + 1] -> array of maxbits() bits
+                                       requires tag binary
+        - Outputs: sign -> 0 in case in <= prime \ 2, 1 otherwise
+                           satisfies tag binary
+         
+    Example: in case we are working in the prime field with p = 11, then Sign()([1, 0, 0, 1]) = 1 as 9 > 5, Sign()([0, 1, 0, 0]) = 0 as 4 <= 5
+          
+*/
 
 template Sign() {
-    signal input in[254];
-    signal output sign;
+    signal input {binary} in[maxbits() + 1];
+    signal output {binary} sign;
 
-    component comp = CompConstant(10944121435919637611123202872628637544274182200208017171849102093287904247808);
+    component comp = CompConstant(- 1 \ 2);
 
-    var i;
-
-    for (i=0; i<254; i++) {
-        comp.in[i] <== in[i];
-    }
-
+    comp.in <== in;
     sign <== comp.out;
 }
+
