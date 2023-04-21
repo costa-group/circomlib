@@ -25,9 +25,6 @@ pragma circom 2.1.5;
 
 include "tags-specifications.circom";
 
-
-// The templates and functions in this file are general and work for any prime field
-
 // To consult the tags specifications check tags-specifications.circom
 
 
@@ -83,7 +80,7 @@ template Montgomery2Edwards() {
 
 
 /*
-*** MontgomeryAdd(): template that receives two inputs in1, in2 representing points of an elliptic curve in Montgomery form and returns the addition of the points
+*** MontgomeryAdd(): template that receives two inputs in1, in2 representing points of the Baby Jubjub curve in Montgomery form and returns the addition of the points
         - Inputs: in1[2] -> array of 2 field values representing a point of the curve in Montgomery form
                   in2[2] -> array of 2 field values representing a point of the curve in Montgomery form
         - Outputs: out[2] -> array of 2 field values representing the point in1 + in2 in Montgomery form
@@ -104,6 +101,8 @@ template MontgomeryAdd() {
     signal input in1[2];
     signal input in2[2];
     signal output out[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616); // to ensure the correct prime
 
     var a = 168700;
     var d = 168696;
@@ -122,7 +121,7 @@ template MontgomeryAdd() {
 
 
 /*
-*** MontgomeryDouble(): template that receives an input in1 representing a point of an elliptic curve in Montgomery form and returns the point 2 * in
+*** MontgomeryDouble(): template that receives an input in1 representing a point of the Baby Jubjub curve in Montgomery form and returns the point 2 * in
         - Inputs: in[2] -> array of 2 field values representing a point of the curve in Montgomery form
         - Outputs: out[2] -> array of 2 field values representing the point 2*in in Montgomery form
          
@@ -147,6 +146,8 @@ template MontgomeryDouble() {
 
     var a = 168700;
     var d = 168696;
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var A = (2 * (a + d)) / (a - d);
     var B = 4 / (a - d);

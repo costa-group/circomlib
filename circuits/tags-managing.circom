@@ -195,3 +195,34 @@ template ForceMaxbitArray(n,m) {
     
     in ==> out;
 }
+
+
+template AddMaxValueTag(n) {
+    signal input in;
+    signal output {max} out;
+    
+    _ <== Num2Bits(nbits(n))(in); // to ensure that it is possible
+    signal out1 <== LessEqThan(nbits(n))([in,n]);
+    out1 === 1;
+    out.max = n;
+    out <== in;
+}
+
+template AddMaxAbsValueTag(n){
+    signal input in;
+    signal output {max_abs} out;
+    _ <== Num2Bits(nbits(2 * n))(in + n); // to ensure that it is >= -max_abs
+    signal out1 <== LessEqThan(nbits(n * 2))([in + n, 2 * n]);   
+    out1 === 1;
+    
+    out.max_abs = n;
+    out <== in;
+}
+
+template AddPowerOf2Tag() {
+    signal input in;
+    signal output {powerof2} out;
+    
+    in ==> out;
+}
+

@@ -21,6 +21,24 @@ pragma circom 2.0.0;
 include "bitify.circom";
 include "binsum.circom";
 
+
+template IsNegative() {                                      // does not work correctly???
+    // check if a signal is negative in circom sense
+    signal input in;
+    signal output {binary} out;
+    var max = -1 >> 1;
+    CompConstant(max)(Num2Bits_strict()(in)) ==> out; // solving: using Num2Bits_strict instead of Num2Bits()
+}
+
+template IsNegativeBounded(){
+    signal input {max_abs} in;
+    signal output {binary} out;
+    
+    signal aux <== in + in.max_abs;
+    out <== LessThan(nbits(2 * in.max_abs))([aux, in.max_abs]);
+}
+
+
 template IsZero() {
     signal input in;
     signal output {binary} out;
