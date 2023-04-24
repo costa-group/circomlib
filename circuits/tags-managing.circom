@@ -114,7 +114,7 @@ template ForceBinaryArray(n) {
         - Output: out -> same value as in, but including maxbit tag with out.maxbit = n
                          satisfies tag out.maxbit = n
          
-    Example: MaxbitTag(5)(14) = 14
+    Example: AddMaxbitTag(5)(14) = 14
     Note: in case the input in does not satisfy the specification of maxbit then the generated system of constraints does not have any solution for that input. 
           For instance, AddMaxbitTag(3)(100) -> no solution
           
@@ -136,7 +136,7 @@ template AddMaxbitTag(n) {
         - Output: out[m] -> same values as in, but including maxbit tag with out.maxbit = n
                          satisfies tag out.maxbit = n
          
-    Example: MaxbitTag(5, 2)([3,14]) = [3, 14] with tag maxbit = 5
+    Example: AddMaxbitTag(5, 2)([3,14]) = [3, 14] with tag maxbit = 5
     Note: in case the a signal of the input in does not satisfy the specification of maxbit then the generated system of constraints does not have any solution for that input. 
           For instance, AddMaxbitTag(3, 2)([3, 100]) -> no solution
           
@@ -197,32 +197,61 @@ template ForceMaxbitArray(n,m) {
 }
 
 
+/*
+*** AddMaxValueTag(n): template that adds the constraints needed to ensure that a signal is smaller or equal than a given value n and adds the tag max = n to the input
+        - Inputs: in -> field value
+        - Output: out -> same value as in, but including max tag with out.max = n
+                         satisfies tag out.max = n
+         
+    Example: AddMaxValueTag(15)(14) = 14 and can be satisfied
+    Note: in case the input in does not satisfy the specification of max then the generated system of constraints does not have any solution for that input. 
+          For instance, AddMaxValueTag(3)(100) -> no solution
+          
+*/
+
 template AddMaxValueTag(n) {
     signal input in;
     signal output {max} out;
     
-    _ <== Num2Bits(nbits(n))(in); // to ensure that it is possible
-    signal out1 <== LessEqThan(nbits(n))([in,n]);
+    signal {maxbit} aux[2];
+    aux.maxbit = nbits(n);
+    aux[0] <== AddMaxbitTag(nbits(n))(in); // to ensure the correct size
+    aux[1] <== n;
+
+    signal out1 <== LessEqThanBounded()(aux);
     out1 === 1;
     out.max = n;
     out <== in;
 }
 
+/*
+*** AddMaxAbsValueTag(n): template that adds the constraints needed to ensure that the absolute value of a signal is smaller or equal than a given value n and adds the tag max_abs = n to the input
+        - Inputs: in -> field value
+        - Output: out -> same value as in, but including max_abs tag with out.max_abs = n
+                         satisfies tag out.max_abs = n
+         
+    Example: AddMaxValueTag(15)(-14) = 14 and can be satisfied
+    Note: in case the input in does not satisfy the specification of max_abs then the generated system of constraints does not have any solution for that input. 
+          For instance, AddMaxAbsValueTag(33)(-100) -> no solution
+          
+*/
+
 template AddMaxAbsValueTag(n){
     signal input in;
     signal output {max_abs} out;
-    _ <== Num2Bits(nbits(2 * n))(in + n); // to ensure that it is >= -max_abs
-    signal out1 <== LessEqThan(nbits(n * 2))([in + n, 2 * n]);   
+    
+    var needed_bits = nbits(2 * n);
+    
+    signal {maxbit} aux[2];
+    aux.maxbit = needed_bits;
+    aux[0] <== AddMaxbitTag(needed_bits)(in + n); // to ensure that 0 <= aux[0] < 2**nbits(2 * n)
+    aux[1] <== 2 * n;
+
+    signal out1 <== LessEqThanBounded()(aux); // checks that 0 <= in + n <= 2 * n <==> -n <= in <= n
     out1 === 1;
     
     out.max_abs = n;
     out <== in;
 }
 
-template AddPowerOf2Tag() {
-    signal input in;
-    signal output {powerof2} out;
-    
-    in ==> out;
-}
 
