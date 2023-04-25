@@ -35,7 +35,7 @@ include "tags-specifications.circom";
         - Outputs: sign -> 0 in case in <= prime \ 2, 1 otherwise
                            satisfies tag binary
          
-    Example: in case we are working in the prime field with p = 11, then Sign()([1, 0, 0, 1]) = 1 as 9 > 5, Sign()([0, 1, 0, 0]) = 0 as 4 <= 5
+    Example: in case we are working in the prime field with p = 11, then Sign()([1, 0, 0, 1]) = 1 as 9 > 5, Sign()([0, 0, 1, 0]) = 0 as 4 <= 5
           
 */
 
