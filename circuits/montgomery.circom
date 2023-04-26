@@ -33,7 +33,7 @@ include "tags-specifications.circom";
         - Inputs: in[2] -> array of 2 field values representing a point of the curve in Edwards form
         - Outputs: out[2] -> array of 2 field values representing a point of the curve in Montgomery form
          
-    Example: if we consider the input in = [u, v], then the circuit produces the following output [x, y]
+    Example: if we consider the input in = [x, y], then the circuit produces the following output [u, v]
     
                 1 + y       1 + y
     [u, v] = [ -------  , ---------- ]
@@ -59,7 +59,7 @@ template Edwards2Montgomery() {
         - Inputs: in[2] -> array of 2 field values representing a point of the curve in Montgomery form
         - Outputs: out[2] -> array of 2 field values representing a point of the curve in Edwards form
          
-    Example: if we consider the input in = [x, y], then the circuit produces the following output [u, v]
+    Example: if we consider the input in = [u, v], then the circuit produces the following output [x, y]
     
                 u    u - 1
     [x, y] = [ ---, ------- ]
@@ -94,7 +94,8 @@ template Montgomery2Edwards() {
     x3 = B * lamda^2 - A - x1 -x2
 
     y3 = lamda * ( x1 - x3 ) - y1
-
+    
+    where A and B are two constants defined below. 
  */
 
 template MontgomeryAdd() {
