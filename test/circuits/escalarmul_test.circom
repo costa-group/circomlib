@@ -12,8 +12,8 @@ template Main() {
             16950150798460657717958625567821834550301663161624707787222815936182638968203];
 
 
-    component n2b = Num2Bits(253);
-    component escalarMul = EscalarMul(253, base);
+    component n2b = Num2Bits(2);
+    component escalarMul = EscalarMul(2, base);
 
     escalarMul.inp[0] <== 0;
     escalarMul.inp[1] <== 1;
@@ -22,7 +22,7 @@ template Main() {
 
     in ==> n2b.in;
 
-    for  (i=0; i<253; i++) {
+    for  (i=0; i<2; i++) {
         n2b.out[i] ==> escalarMul.in[i];
     }
 

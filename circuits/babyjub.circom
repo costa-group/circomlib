@@ -136,7 +136,6 @@ This template is used to extract the public key from the private key.
     
 */
 
-// Extracts the public key from private key
 template BabyPbk() {
     signal input  in;
     signal output Ax;
