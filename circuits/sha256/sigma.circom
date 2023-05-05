@@ -22,56 +22,53 @@ include "xor3.circom";
 include "rotate.circom";
 include "shift.circom";
 
+/*
+*** SmallSigma(): It computes the sigma function  for the sha256 by rotations and shift operations.
+        - Inputs: in2[32] -> satisfies tag binary
+        - Outputs: out[32] -> satisfies tag binary
+*/
 template SmallSigma(ra, rb, rc) {
-    signal input in[32];
-    signal output out[32];
+    signal input {binary} in[32];
+    signal output {binary} out[32];
     var k;
 
     component rota = RotR(32, ra);
     component rotb = RotR(32, rb);
     component shrc = ShR(32, rc);
 
-    for (k=0; k<32; k++) {
-        rota.in[k] <== in[k];
-        rotb.in[k] <== in[k];
-        shrc.in[k] <== in[k];
-    }
+    rota.in <== in;
+    rotb.in <== in;
+    shrc.in <== in;
 
     component xor3 = Xor3(32);
-    for (k=0; k<32; k++) {
-        xor3.a[k] <== rota.out[k];
-        xor3.b[k] <== rotb.out[k];
-        xor3.c[k] <== shrc.out[k];
-    }
+    xor3.a <== rota.out;
+    xor3.b <== rotb.out;
+    xor3.c <== shrc.out;
 
-    for (k=0; k<32; k++) {
-        out[k] <== xor3.out[k];
-    }
+    out <== xor3.out;
 }
 
+/*
+*** BigSigma(): It computes the SIGMA function  for the sha256 by rotations and shift operations.
+        - Inputs: in2[32] -> satisfies tag binary
+        - Outputs: out[32] -> satisfies tag binary
+*/
 template BigSigma(ra, rb, rc) {
-    signal input in[32];
-    signal output out[32];
+    signal input {binary} in[32];
+    signal output {binary} out[32];
     var k;
 
     component rota = RotR(32, ra);
     component rotb = RotR(32, rb);
     component rotc = RotR(32, rc);
-    for (k=0; k<32; k++) {
-        rota.in[k] <== in[k];
-        rotb.in[k] <== in[k];
-        rotc.in[k] <== in[k];
-    }
+    rota.in <== in;
+    rotb.in <== in;
+    rotc.in <== in;
 
     component xor3 = Xor3(32);
+    xor3.a <== rota.out;
+    xor3.b <== rotb.out;
+    xor3.c <== rotc.out;
 
-    for (k=0; k<32; k++) {
-        xor3.a[k] <== rota.out[k];
-        xor3.b[k] <== rotb.out[k];
-        xor3.c[k] <== rotc.out[k];
-    }
-
-    for (k=0; k<32; k++) {
-        out[k] <== xor3.out[k];
-    }
+    out <== xor3.out;
 }

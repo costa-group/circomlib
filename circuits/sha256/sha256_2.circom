@@ -25,7 +25,7 @@ include "../bitify.circom";
 template Sha256_2() {
     signal input a;
     signal input b;
-    signal output out;
+    signal output {maxbit} out;
 
     var i;
     var k;
@@ -87,5 +87,6 @@ template Sha256_2() {
         bits2num.in[i] <== sha256compression.out[255-i];
     }
 
+    out.maxbit = 216;
     out <== bits2num.out;
 }

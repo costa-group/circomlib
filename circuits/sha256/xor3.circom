@@ -28,14 +28,19 @@ out = a*( 1 - 2*b - 2*c + 4*b*c ) + b + c - 2*b*c =>
 mid = b*c
 out = a*( 1 - 2*b -2*c + 4*mid ) + b + c - 2 * mid
 
+       - Inputs: a[n], b[n], c[n] -> satisfy tag binary
+        - Outputs: out[n] -> satisfies tag binary
+
+        Example: RotR(4,2)([1,0,0,0]) = [0,0,1,0]
+*/
 */
 pragma circom 2.0.0;
 
 template Xor3(n) {
-    signal input a[n];
-    signal input b[n];
-    signal input c[n];
-    signal output out[n];
+    signal input {binary} a[n];
+    signal input {binary} b[n];
+    signal input {binary} c[n];
+    signal output {binary} out[n];
     signal mid[n];
 
     for (var k=0; k<n; k++) {

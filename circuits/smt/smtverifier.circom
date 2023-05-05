@@ -39,15 +39,15 @@ include "smtverifiersm.circom";
 include "smthash_poseidon.circom";
 
 template SMTVerifier(nLevels) {
-    signal input enabled;
+    signal input {binary} enabled;
     signal input root;
     signal input siblings[nLevels];
     signal input oldKey;
     signal input oldValue;
-    signal input isOld0;
+    signal input {binary} isOld0;
     signal input key;
     signal input value;
-    signal input fnc;
+    signal input {binary} fnc;
 
     var i;
 
@@ -114,7 +114,7 @@ template SMTVerifier(nLevels) {
     }
 
 
-    // Check that if checking for non inclussuin and isOld0==0 then key!=old
+    // Check that if checking for non inclussion and isOld0==0 then key!=old
     component areKeyEquals = IsEqual();
     areKeyEquals.in[0] <== oldKey;
     areKeyEquals.in[1] <== key;

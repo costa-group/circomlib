@@ -144,10 +144,10 @@ template SMTProcessor(nLevels) {
     signal input siblings[nLevels];
     signal input oldKey;
     signal input oldValue;
-    signal input isOld0;
+    signal input {binary} isOld0;
     signal input newKey;
     signal input newValue;
-    signal input fnc[2];
+    signal input {binary} fnc[2];
 
     signal enabled;
 
