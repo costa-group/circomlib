@@ -24,8 +24,7 @@ template Main() {
         n2b[1].out[i] ==> pedersen.in[250+i];
     }
 
-    pedersen.out[0] ==> out[0];
-    pedersen.out[1] ==> out[1];
+    pedersen.out ==> out;
 }
 
 component main = Main();

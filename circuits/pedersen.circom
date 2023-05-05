@@ -16,17 +16,38 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
-pragma circom 2.0.0;
+pragma circom 2.1.5;
 
 include "montgomery.circom";
 include "mux3.circom";
 include "babyjub.circom";
+include "tags-specifications.circom";
 
+
+// To consult the tags specifications check tags-specifications.circom
+
+/*
+
+*** Window4(): template that given a point in Montgomery representation base and a binary input in, calculates:
+        out = base + base*in[0] + 2*base*in[1] + 4*base*in[2] in case in[3] == 0, in case in[3] == 1 then it negates out[1]
+        
+        out4 = 4*base
+
+    This circuit is used in order to perform the Pedersen protocol on an input in.
+        - Inputs: in[4] -> binary value
+                         requires tag binary
+                  base[2] -> input curve point in Montgomery representation
+        - Outputs: out[2] -> output curve point in Montgomery representation
+                   out8[2] -> output curve point in Montgomery representation
+    
+ */
 template Window4() {
-    signal input in[4];
+    signal input {binary}in[4];
     signal input base[2];
     signal output out[2];
     signal output out8[2];   // Returns 8*Base (To be linked)
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     component mux = MultiMux3(2);
 
@@ -48,71 +69,74 @@ template Window4() {
     mux.c[1][0] <== base[1];
 
 // in[1] -> 2*BASE
-    dbl2.in[0] <== base[0];
-    dbl2.in[1] <== base[1];
+    dbl2.in <== base;
     mux.c[0][1] <== dbl2.out[0];
     mux.c[1][1] <== dbl2.out[1];
 
 // in[2] -> 3*BASE
-    adr3.in1[0] <== base[0];
-    adr3.in1[1] <== base[1];
-    adr3.in2[0] <== dbl2.out[0];
-    adr3.in2[1] <== dbl2.out[1];
+    adr3.in1 <== base;
+    adr3.in2 <== dbl2.out;
     mux.c[0][2] <== adr3.out[0];
     mux.c[1][2] <== adr3.out[1];
 
 // in[3] -> 4*BASE
-    adr4.in1[0] <== base[0];
-    adr4.in1[1] <== base[1];
-    adr4.in2[0] <== adr3.out[0];
-    adr4.in2[1] <== adr3.out[1];
+    adr4.in1 <== base;
+    adr4.in2 <== adr3.out;
     mux.c[0][3] <== adr4.out[0];
     mux.c[1][3] <== adr4.out[1];
 
 // in[4] -> 5*BASE
-    adr5.in1[0] <== base[0];
-    adr5.in1[1] <== base[1];
-    adr5.in2[0] <== adr4.out[0];
-    adr5.in2[1] <== adr4.out[1];
+    adr5.in1 <== base;
+    adr5.in2 <== adr4.out;
     mux.c[0][4] <== adr5.out[0];
     mux.c[1][4] <== adr5.out[1];
 
 // in[5] -> 6*BASE
-    adr6.in1[0] <== base[0];
-    adr6.in1[1] <== base[1];
-    adr6.in2[0] <== adr5.out[0];
-    adr6.in2[1] <== adr5.out[1];
+    adr6.in1 <== base;
+    adr6.in2 <== adr5.out;
     mux.c[0][5] <== adr6.out[0];
     mux.c[1][5] <== adr6.out[1];
 
 // in[6] -> 7*BASE
-    adr7.in1[0] <== base[0];
-    adr7.in1[1] <== base[1];
-    adr7.in2[0] <== adr6.out[0];
-    adr7.in2[1] <== adr6.out[1];
+    adr7.in1 <== base;
+    adr7.in2 <== adr6.out;
     mux.c[0][6] <== adr7.out[0];
     mux.c[1][6] <== adr7.out[1];
 
 // in[7] -> 8*BASE
-    adr8.in1[0] <== base[0];
-    adr8.in1[1] <== base[1];
-    adr8.in2[0] <== adr7.out[0];
-    adr8.in2[1] <== adr7.out[1];
+    adr8.in1 <== base;
+    adr8.in2 <== adr7.out;
     mux.c[0][7] <== adr8.out[0];
     mux.c[1][7] <== adr8.out[1];
 
-    out8[0] <== adr8.out[0];
-    out8[1] <== adr8.out[1];
+    out8 <== adr8.out;
 
     out[0] <== mux.out[0];
     out[1] <== - mux.out[1]*2*in[3] + mux.out[1];  // Negate y if in[3] is one
 }
 
 
+/*
+
+*** Segment(nWindows):template used to perform a segment of the multiplications needed to perform a the Pedersen protocol. 
+        - Inputs: in[4 * nWindows] -> binary representation of the scalar
+                                      requires tag binary
+                  base[2] -> input curve point in Edwards representation
+        - Outputs: out[2] -> output curve point in Edwards representation
+    
+ */
+
+
+// TODO: We are returning dbl in Montgomery and then transforming it to Edwards to then again transform it to Montgomery here. We can improve this if we expect a value in MOntgomery and only transform outside the first value. If we have a lot of segments we are improving the efficiency
+
+// TODO: revisar, la ultima window no la usamos en el caso en que nWindows > 1 --> bug o podríamos quitarla?
+
 template Segment(nWindows) {
-    signal input in[nWindows*4];
+    signal input {binary} in[nWindows*4];
     signal input base[2];
     signal output out[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var i;
     var j;
@@ -120,8 +144,7 @@ template Segment(nWindows) {
     // Convert the base to montgomery
 
     component e2m = Edwards2Montgomery();
-    e2m.in[0] <== base[0];
-    e2m.in[1] <== base[1];
+    e2m.in <== base;
 
     component windows[nWindows];
     component doublers1[nWindows-1];
@@ -133,48 +156,48 @@ template Segment(nWindows) {
             windows[i].in[j] <== in[4*i+j];
         }
         if (i==0) {
-            windows[i].base[0] <== e2m.out[0];
-            windows[i].base[1] <== e2m.out[1];
+            windows[i].base <== e2m.out;
         } else {
             doublers1[i-1] = MontgomeryDouble();
             doublers2[i-1] = MontgomeryDouble();
-            doublers1[i-1].in[0] <== windows[i-1].out8[0];
-            doublers1[i-1].in[1] <== windows[i-1].out8[1];
-            doublers2[i-1].in[0] <== doublers1[i-1].out[0];
-            doublers2[i-1].in[1] <== doublers1[i-1].out[1];
+            doublers1[i-1].in <== windows[i-1].out8;
+            doublers2[i-1].in <== doublers1[i-1].out;
 
-            windows[i].base[0] <== doublers2[i-1].out[0];
-            windows[i].base[1] <== doublers2[i-1].out[1];
+            windows[i].base <== doublers2[i-1].out;
 
             adders[i-1] = MontgomeryAdd();
             if (i==1) {
-                adders[i-1].in1[0] <== windows[0].out[0];
-                adders[i-1].in1[1] <== windows[0].out[1];
+                adders[i-1].in1 <== windows[0].out;
             } else {
-                adders[i-1].in1[0] <== adders[i-2].out[0];
-                adders[i-1].in1[1] <== adders[i-2].out[1];
+                adders[i-1].in1 <== adders[i-2].out;
             }
-            adders[i-1].in2[0] <== windows[i].out[0];
-            adders[i-1].in2[1] <== windows[i].out[1];
+            adders[i-1].in2 <== windows[i].out;
         }
     }
 
     component m2e = Montgomery2Edwards();
 
     if (nWindows > 1) {
-        m2e.in[0] <== adders[nWindows-2].out[0];
-        m2e.in[1] <== adders[nWindows-2].out[1];
+        m2e.in <== adders[nWindows-2].out;
     } else {
-        m2e.in[0] <== windows[0].out[0];
-        m2e.in[1] <== windows[0].out[1];
+        m2e.in <== windows[0].out;
     }
 
-    out[0] <== m2e.out[0];
-    out[1] <== m2e.out[1];
+    out <== m2e.out;
 }
 
+
+/*
+
+*** Pedersen(n): template that performs the Pedersen protocol on the input in, that is the binary representation of a value x using n bits. It calculates the output point of the protocol out in Edwards representation
+        - Inputs: in[n] -> binary representation of the scalar
+                          requires tag binary
+        - Outputs: out[2] -> output curve point in Edwards representation
+    
+ */
+
 template Pedersen(n) {
-    signal input in[n];
+    signal input {binary} in[n];
     signal output out[2];
 
     var BASE[10][2] = [
@@ -190,6 +213,8 @@ template Pedersen(n) {
         [18597552580465440374022635246985743886550544261632147935254624835147509493269,6753322320275422086923032033899357299485124665258735666995435957890214041481]
 
     ];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var nSegments = ((n-1)\200)+1;
 
@@ -199,18 +224,19 @@ template Pedersen(n) {
     var j;
     var nBits;
     var nWindows;
+    
+    signal {binary} aux_0 <== 0;
     for (i=0; i<nSegments; i++) {
         nBits = (i == (nSegments-1)) ? n - (nSegments-1)*200 : 200;
         nWindows = ((nBits - 1)\4)+1;
         segments[i] = Segment(nWindows);
-        segments[i].base[0] <== BASE[i][0];
-        segments[i].base[1] <== BASE[i][1];
+        segments[i].base <== BASE[i];
         for (j = 0; j<nBits; j++) {
             segments[i].in[j] <== in[i*200+j];
         }
         // Fill padding bits
         for (j = nBits; j < nWindows*4; j++) {
-            segments[i].in[j] <== 0;
+            segments[i].in[j] <== aux_0;
         }
     }
 
@@ -231,20 +257,6 @@ template Pedersen(n) {
         }
     }
 
-/*
-    coponent packPoint = PackPoint();
-
-    if (nSegments>1) {
-        packPoint.in[0] <== adders[nSegments-2].xout;
-        packPoint.in[1] <== adders[nSegments-2].yout;
-    } else {
-        packPoint.in[0] <== segments[0].out[0];
-        packPoint.in[1] <== segments[0].out[1];
-    }
-
-    out[0] <== packPoint.out[0];
-    out[1] <== packPoint.out[1];
-*/
 
     if (nSegments>1) {
         out[0] <== adders[nSegments-2].xout;

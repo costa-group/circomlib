@@ -19,10 +19,26 @@
 pragma circom 2.0.0;
 
 include "escalarmul.circom";
+include "tags-specifications.circom";
+include "tags-specifications.circom";
+
+
+// To consult the tags specifications check tags-specifications.circom
+
+/*
+
+*** Pedersen(n): template that performs the Pedersen protocol on the input in, that is the binary representation of a value x using n bits. It calculates the output point of the protocol out in Edwards representation
+        - Inputs: e[n] -> binary representation of the scalar
+                          requires tag binary
+        - Outputs: out[2] -> output curve point in Edwards representation
+    
+ */
 
 template Pedersen(n) {
-    signal input in[n];
+    signal input {binary} in[n];
     signal output out[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var nexps = ((n-1) \ 250) + 1;
     var nlastbits = n - (nexps-1)*250;
@@ -55,14 +71,11 @@ template Pedersen(n) {
         }
 
         if (i==0) {
-            escalarMuls[i].inp[0] <== 0;
-            escalarMuls[i].inp[1] <== 1;
+            escalarMuls[i].inp <== [0, 1];
         } else {
-            escalarMuls[i].inp[0] <== escalarMuls[i-1].out[0];
-            escalarMuls[i].inp[1] <== escalarMuls[i-1].out[1];
+            escalarMuls[i].inp <== escalarMuls[i-1].out;
         }
     }
 
-    escalarMuls[nexps-1].out[0] ==> out[0];
-    escalarMuls[nexps-1].out[1] ==> out[1];
+    escalarMuls[nexps-1].out ==> out;
 }

@@ -48,6 +48,8 @@ template BitElementMulAny() {
     signal input addIn[2];
     signal output dblOut[2];
     signal output addOut[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     component doubler = MontgomeryDouble();
     component adder = MontgomeryAdd();
@@ -87,6 +89,8 @@ template SegmentMulAny(n) {
     signal input p[2];
     signal output out[2];
     signal output dbl[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     component bits[n-1];
 
@@ -151,6 +155,8 @@ template EscalarMulAny(n) {
     signal input {binary} e[n];              // Input in binary format
     signal input p[2];              // Point (Twisted format)
     signal output out[2];           // Point (Twisted format)
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var nsegments = (n-1)\148 +1;
     var nlastsegment = n - (nsegments-1)*148;

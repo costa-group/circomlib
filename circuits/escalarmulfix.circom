@@ -40,11 +40,14 @@ include "tags-specifications.circom";
                    out8[2] -> output curve point in Montgomery representation
     
  */
+ 
 template WindowMulFix() {
     signal input {binary} in[3];
     signal input base[2];
     signal output out[2];
     signal output out8[2];   // Returns 8*Base (To be linked)
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     component mux = MultiMux3(2);
 
@@ -111,7 +114,7 @@ template WindowMulFix() {
 
 /*
 
-*** SegmentMulFix(): template that does a multiplication of a scalar times a fix base. It receives a point in Edwards representation base and a binary input in representing a value k, and calculates the point k * p.
+*** SegmentMulFix(nWindows): template used to perform a segment of the multiplications needed to perform a multiplication of a scalar times a fix base. 
         - Inputs: e[3 * nWindows] -> binary representation of the scalar
                                      requires tag binary
                   base[2] -> input curve point in Edwards representation
@@ -128,6 +131,8 @@ template SegmentMulFix(nWindows) {
     signal input base[2];
     signal output out[2];
     signal output dbl[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var i;
     var j;
@@ -195,7 +200,7 @@ template SegmentMulFix(nWindows) {
 
 /*
 
-*** EscalarMulFix(): template that does a multiplication of a scalar times a fixed point BASE. It receives a point in Edwards representation BASE and a binary input in representing a value k, and calculates the point k * p.
+*** EscalarMulFix(n, BASE): template that does a multiplication of a scalar times a fixed point BASE. It receives a point in Edwards representation BASE and a binary input in representing a value k, and calculates the point k * p.
         - Inputs: e[n] -> binary representation of the scalar
                           requires tag binary
         - Outputs: out[2] -> output curve point in Edwards representation
@@ -204,6 +209,8 @@ template SegmentMulFix(nWindows) {
 template EscalarMulFix(n, BASE) {
     signal input {binary} e[n];              // Input in binary format
     signal output out[2];           // Point (Twisted format)
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var nsegments = (n-1)\246 +1;       // 249 probably would work. But I'm not sure and for security I keep 246
     var nlastsegment = n - (nsegments-1)*249;
