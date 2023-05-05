@@ -16,14 +16,22 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
-pragma circom 2.0.0;
+pragma circom 2.1.5;
 
 include "bitify.circom";
 include "aliascheck.circom";
 include "compconstant.circom";
 include "babyjub.circom";
+include "tags-specifications.circom";
 
 
+// To consult the tags specifications check tags-specifications.circom
+
+/*
+
+*** sqrt(n): function that returns the square of the value n. That is, it returns a value r s.t. r * r = n mod p
+    
+ */
 function sqrt(n) {
 
     if (n == 0) {
@@ -70,23 +78,63 @@ function sqrt(n) {
 }
 
 
-template Bits2Point() {
-    signal input in[256];
-    signal output out[2];
+/*
+
+*** CheckPointBits_strict(n): template that checks that an input in of 256 correctly encodes a point of the curve in Edwards representation.
+        - Inputs: in[256] -> encoding of the point using 256 bits
+                           requires tag binary
+        - Outputs: none
+                               
+    Necessary conditions: 
+       in[0..253] -> has to be the binary representation of a value in the field (check that x <= p-1)
+       in[254] -> 0
+       
+    Obs: in case the conditions are not satisfied the template fails and does not accept the input
+    
+*/
+
+template CheckPointBits_strict(){
+    signal input {binary} in[256];
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
+    component aliasCheckY = AliasCheck(); 
+    for (var i=0; i<254; i++) {
+        aliasCheckY.in[i] <== in[i];
+    }
+    
+    in[254] === 0; 
+    in[255] ==> _;
 }
 
+
+/*
+
+*** Bits2Pint_Strict(n): template that receives the encoding of a point of a curve using 256 bits and returns its Edwards representation
+        - Inputs: in[256] -> encoding of the point using 256 bits 
+                           requires tag binary
+        - Outputs: out[2] -> curve point using Edwards representation
+                               
+    Encoding:
+       in[0..253] -> binary representation of out[1]
+       in[254] -> 0
+       in[255] -> if out[0] is positive then 0, else 1
+*/
+
+// TODO: the template adds an extra check: it check if in represents a value of the fiedl. This check adds many constraints and its unnecesary (most of the times). I have moved this checks out of the template to CheckPointBits_strict
+
 template Bits2Point_Strict() {
-    signal input in[256];
+    signal input {binary} in[256];
     signal output out[2];
 
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
     var i;
 
     // Check aliasing
-    component aliasCheckY = AliasCheck();
-    for (i=0; i<254; i++) {
-        aliasCheckY.in[i] <== in[i];
-    }
-    in[254] === 0;
+    //component aliasCheckY = AliasCheck(); //?
+    //for (i=0; i<254; i++) {
+    //    aliasCheckY.in[i] <== in[i];
+    //}
+    
+    //in[254] === 0; // just to check that the value is a correct representation
 
     component b2nY = Bits2Num(254);
     for (i=0; i<254; i++) {
@@ -110,51 +158,43 @@ template Bits2Point_Strict() {
     babyCheck.x <== out[0];
     babyCheck.y <== out[1];
 
-    component n2bX = Num2Bits(254);
-    n2bX.in <== out[0];
-    component aliasCheckX = AliasCheck();
-    for (i=0; i<254; i++) {
-        aliasCheckX.in[i] <== n2bX.out[i];
-    }
-
-    component signCalc = CompConstant(10944121435919637611123202872628637544274182200208017171849102093287904247808);
-    for (i=0; i<254; i++) {
-        signCalc.in[i] <== n2bX.out[i];
-    }
+    component signCalc = IsNegative();
+    log(-1 >> 1);
+    signCalc.in <== out[0];
 
     signCalc.out === in[255];
+    
+    in[254] ==> _;
 }
 
 
-template Point2Bits() {
-    signal input in[2];
-    signal output out[256];
 
+/*
 
-}
+*** Point2Bits_Strict(n): template that receives a point as an input and returns its encoding using 256 bits
+        - Inputs: in[2] -> curve point using Edwards representation
+        - Outputs: out[256] -> encoding of the point using 256 bits
+                               satisfies tag binary
+                               
+    Encoding:
+       out[0..253] -> binary representation of in[1]
+       out[254] -> 0
+       out[255] -> if in[0] is positive then 0, else 1
+*/
 
 template Point2Bits_Strict() {
     signal input in[2];
-    signal output out[256];
+    signal output {binary} out[256];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var i;
 
-    component n2bX = Num2Bits(254);
-    n2bX.in <== in[0];
     component n2bY = Num2Bits(254);
     n2bY.in <== in[1];
 
-    component aliasCheckX = AliasCheck();
-    component aliasCheckY = AliasCheck();
-    for (i=0; i<254; i++) {
-        aliasCheckX.in[i] <== n2bX.out[i];
-        aliasCheckY.in[i] <== n2bY.out[i];
-    }
-
-    component signCalc = CompConstant(10944121435919637611123202872628637544274182200208017171849102093287904247808);
-    for (i=0; i<254; i++) {
-        signCalc.in[i] <== n2bX.out[i];
-    }
+    component signCalc = IsNegative();
+    signCalc.in <== in[0];
 
     for (i=0; i<254; i++) {
         out[i] <== n2bY.out[i];

@@ -81,6 +81,8 @@ template EscalarMulWindow(base, k) {
     signal input in[2];
     signal input {binary} sel[4];
     signal output out[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var table[16][2];
     component mux;
@@ -146,6 +148,8 @@ template EscalarMul(n, base) {
     signal input {binary} in[n];
     signal input inp[2];   // Point input to be added
     signal output out[2];
+    
+    assert(-1 == 21888242871839275222246405745257275088548364400416034343698204186575808495616);
 
     var nBlocks = ((n-1)>>2)+1;
     var i;
