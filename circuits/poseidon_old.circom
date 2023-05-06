@@ -1,42 +1,21 @@
-pragma circom 2.0.0;
+pragma circom 2.1.5;
 
-include "./poseidon_constants.circom";
+include "./poseidon_constants_old.circom";
+include "./poseidon_utils.circom";
+include "tags-specifications.circom";
 
-template Sigma() {
-    signal input in;
-    signal output out;
 
-    signal in2;
-    signal in4;
+// To consult the tags specifications check tags-specifications.circom
 
-    in2 <== in*in;
-    in4 <== in2*in2;
 
-    out <== in4*in;
-}
+/*
 
-template Ark(t, C, r) {
-    signal input in[t];
-    signal output out[t];
+*** Poseidon(nInputs): template that implements the Poseidon hash protocol for nInputs. The circuit receives the inputs to be hashed and returns the hashed values. It takes the value 0 as initial state. 
+        - Inputs: inputs[nInputs] -> field value
+        - Outputs: out -> field value
+*/
 
-    for (var i=0; i<t; i++) {
-        out[i] <== in[i] + C[i + r];
-    }
-}
 
-template Mix(t, M) {
-    signal input in[t];
-    signal output out[t];
-
-    var lc;
-    for (var i=0; i<t; i++) {
-        lc = 0;
-        for (var j=0; j<t; j++) {
-            lc += M[i][j]*in[j];
-        }
-        out[i] <== lc;
-    }
-}
 
 template Poseidon(nInputs) {
     signal input inputs[nInputs];
@@ -94,4 +73,7 @@ template Poseidon(nInputs) {
     }
 
     out <== mix[nRoundsF + nRoundsP -1].out[0];
+    for(var i = 1; i < t; i++){
+       mix[nRoundsF + nRoundsP -1].out[i] ==> _;
+    }
 }
