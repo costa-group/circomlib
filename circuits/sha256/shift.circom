@@ -18,9 +18,16 @@
 */
 pragma circom 2.0.0;
 
+/*
+*** ShR(): It shifts r places to the left. 
+        - Inputs: in[n] -> satisfies tag binary
+        - Outputs: out[n] -> satisfies tag binary
+
+        Example: ShR(4,3)([1,0,0,1]) = [1,0,0,0]
+*/
 template ShR(n, r) {
-    signal input in[n];
-    signal output out[n];
+    signal input {binary} in[n];
+    signal output {binary} out[n];
 
     for (var i=0; i<n; i++) {
         if (i+r >= n) {

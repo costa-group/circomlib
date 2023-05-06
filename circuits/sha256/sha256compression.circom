@@ -25,11 +25,22 @@ include "../binsum.circom";
 include "sigmaplus.circom";
 include "sha256compression_function.circom";
 
+/*
+*** Sha256compression(): Takes a hash value and a message blocked and produces a new hash value.
+        - Inputs: hin[256] -> A 256-bit intermediate hash value
+                                satisfies tag binary
+                  inp[512] -> A message block of 512-bits
+                                satisfies tag binary
+        - Outputs: out[256] -> A 256-bit new intermediate hash value
+                                satisfies tag binary
+         
+    
+*/
 
 template Sha256compression() {
-    signal input hin[256];
-    signal input inp[512];
-    signal output out[256];
+    signal input {binary} hin[256];
+    signal input {binary} inp[512];
+    signal output {binary} out[256];
     signal a[65][32];
     signal b[65][32];
     signal c[65][32];
@@ -76,16 +87,11 @@ template Sha256compression() {
                 w[t][k] <== inp[t*32+31-k];
             }
         } else {
-            for (k=0; k<32; k++) {
-                sigmaPlus[t-16].in2[k] <== w[t-2][k];
-                sigmaPlus[t-16].in7[k] <== w[t-7][k];
-                sigmaPlus[t-16].in15[k] <== w[t-15][k];
-                sigmaPlus[t-16].in16[k] <== w[t-16][k];
-            }
-
-            for (k=0; k<32; k++) {
-                w[t][k] <== sigmaPlus[t-16].out[k];
-            }
+            sigmaPlus[t-16].in2 <== w[t-2];
+            sigmaPlus[t-16].in7 <== w[t-7];
+            sigmaPlus[t-16].in15 <== w[t-15];
+            sigmaPlus[t-16].in16 <== w[t-16];
+            w[t] <== sigmaPlus[t-16].out;
         }
     }
 
@@ -101,37 +107,33 @@ template Sha256compression() {
     }
 
     for (t = 0; t<64; t++) {
-        for (k=0; k<32; k++) {
-            t1[t].h[k] <== h[t][k];
-            t1[t].e[k] <== e[t][k];
-            t1[t].f[k] <== f[t][k];
-            t1[t].g[k] <== g[t][k];
-            t1[t].k[k] <== ct_k[t].out[k];
-            t1[t].w[k] <== w[t][k];
+            t1[t].h <== h[t];
+            t1[t].e <== e[t];
+            t1[t].f <== f[t];
+            t1[t].g <== g[t];
+            t1[t].k <== ct_k[t].out;
+            t1[t].w <== w[t];
 
-            t2[t].a[k] <== a[t][k];
-            t2[t].b[k] <== b[t][k];
-            t2[t].c[k] <== c[t][k];
-        }
+            t2[t].a <== a[t];
+            t2[t].b <== b[t];
+            t2[t].c <== c[t];
 
-        for (k=0; k<32; k++) {
-            sume[t].in[0][k] <== d[t][k];
-            sume[t].in[1][k] <== t1[t].out[k];
+            sume[t].in[0] <== d[t];
+            sume[t].in[1] <== t1[t].out;
 
-            suma[t].in[0][k] <== t1[t].out[k];
-            suma[t].in[1][k] <== t2[t].out[k];
-        }
+            suma[t].in[0] <== t1[t].out;
+            suma[t].in[1] <== t2[t].out;
+        
 
-        for (k=0; k<32; k++) {
-            h[t+1][k] <== g[t][k];
-            g[t+1][k] <== f[t][k];
-            f[t+1][k] <== e[t][k];
-            e[t+1][k] <== sume[t].out[k];
-            d[t+1][k] <== c[t][k];
-            c[t+1][k] <== b[t][k];
-            b[t+1][k] <== a[t][k];
-            a[t+1][k] <== suma[t].out[k];
-        }
+            h[t+1] <== g[t];
+            g[t+1] <== f[t];
+            f[t+1] <== e[t];
+            e[t+1] <== sume[t].out;
+            d[t+1] <== c[t];
+            c[t+1] <== b[t];
+            b[t+1] <== a[t];
+            a[t+1] <== suma[t].out;
+        
     }
 
     for (k=0; k<32; k++) {
