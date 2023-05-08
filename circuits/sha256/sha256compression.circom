@@ -41,15 +41,15 @@ template Sha256compression() {
     signal input {binary} hin[256];
     signal input {binary} inp[512];
     signal output {binary} out[256];
-    signal a[65][32];
-    signal b[65][32];
-    signal c[65][32];
-    signal d[65][32];
-    signal e[65][32];
-    signal f[65][32];
-    signal g[65][32];
-    signal h[65][32];
-    signal w[64][32];
+    signal {binary} a[65][32];
+    signal {binary} b[65][32];
+    signal {binary} c[65][32];
+    signal {binary} d[65][32];
+    signal {binary} e[65][32];
+    signal {binary} f[65][32];
+    signal {binary} g[65][32];
+    signal {binary} h[65][32];
+    signal {binary} w[64][32];
 
 
     var outCalc[256] = sha256compression(hin, inp);
@@ -125,14 +125,16 @@ template Sha256compression() {
             suma[t].in[1] <== t2[t].out;
         
 
-            h[t+1] <== g[t];
-            g[t+1] <== f[t];
-            f[t+1] <== e[t];
-            e[t+1] <== sume[t].out;
-            d[t+1] <== c[t];
-            c[t+1] <== b[t];
-            b[t+1] <== a[t];
-            a[t+1] <== suma[t].out;
+            for (k=0; k<32; k++) {
+                h[t+1][k] <== g[t][k];
+                g[t+1][k] <== f[t][k];
+                f[t+1][k] <== e[t][k];
+                e[t+1][k] <== sume[t].out[k];
+                d[t+1][k] <== c[t][k];
+                c[t+1][k] <== b[t][k];
+                b[t+1][k] <== a[t][k];
+                a[t+1][k] <== suma[t].out[k];
+            }
         
     }
 

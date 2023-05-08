@@ -33,7 +33,7 @@ out = a*( 1 - 2*b -2*c + 4*mid ) + b + c - 2 * mid
 
         Example: RotR(4,2)([1,0,0,0]) = [0,0,1,0]
 */
-*/
+
 pragma circom 2.0.0;
 
 template Xor3(n) {

@@ -36,21 +36,17 @@ template T1() {
     component ch = Ch_t(32);
     component bigsigma1 = BigSigma(6, 11, 25);
 
-    for (ki=0; ki<32; ki++) {
-        bigsigma1.in[ki] <== e[ki];
-        ch.a[ki] <== e[ki];
-        ch.b[ki] <== f[ki];
-        ch.c[ki] <== g[ki];
-    }
+    bigsigma1.in <== e;
+    ch.a <== e;
+    ch.b <== f;
+    ch.c <== g;
 
     component sum = BinSum(32, 5);
-    for (ki=0; ki<32; ki++) {
-        sum.in[0][ki] <== h[ki];
-        sum.in[1][ki] <== bigsigma1.out[ki];
-        sum.in[2][ki] <== ch.out[ki];
-        sum.in[3][ki] <== k[ki];
-        sum.in[4][ki] <== w[ki];
-    }
+    sum.in[0] <== h;
+    sum.in[1] <== bigsigma1.out;
+    sum.in[2] <== ch.out;
+    sum.in[3] <== k;
+    sum.in[4] <== w;
 
     for (ki=0; ki<32; ki++) {
         out[ki] <== sum.out[ki];

@@ -119,9 +119,11 @@ template SMTVerifier(nLevels) {
     areKeyEquals.in[0] <== oldKey;
     areKeyEquals.in[1] <== key;
 
+
+    signal {binary} keys_1 <== 1-isOld0;
     component keysOk = MultiAND(4);
     keysOk.in[0] <== fnc;
-    keysOk.in[1] <== 1-isOld0;
+    keysOk.in[1] <== keys_1;
     keysOk.in[2] <== areKeyEquals.out;
     keysOk.in[3] <== enabled;
 
