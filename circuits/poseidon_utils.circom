@@ -59,7 +59,7 @@ template Ark(t, C, r) {
         
     Mix(2, [[1, 2], [3, 4]])([1, 0]) = [1, 3]
     
-    Obs: M is expected to be a matrix of dimensions at leadt t * t
+    Obs: M is expected to be a matrix of dimensions at least t * t
     
 */
 
