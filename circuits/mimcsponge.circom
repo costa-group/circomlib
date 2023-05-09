@@ -1,8 +1,24 @@
-pragma circom 2.0.0;
+pragma circom 2.1.5;
+include "tags-specifications.circom";
+
+
+// To consult the tags specifications check tags-specifications.circom
+
 
 // implements MiMC-2n/n as hash using a sponge construction.
 // log_5(21888242871839275222246405745257275088548364400416034343698204186575808495617) ~= 110
 // => nRounds should be 220
+
+
+/*
+
+*** MultiMiMC7(nInputs, nRounds): template that implements the MiMC-2n/n protocol as hash using a sponge construction. The circuit receives nInputs inputs to be hashed and the value k, and returns the hash values. The template has as parameters the number of inputs, the number of outputs and the number of rounds of the protocol.
+        - Inputs: ins[nInputs] -> field value
+                  k -> field value
+        - Outputs: outs[nOutputs] -> field value
+*/
+
+
 template MiMCSponge(nInputs, nRounds, nOutputs) {
   signal input ins[nInputs];
   signal input k;
@@ -35,6 +51,18 @@ template MiMCSponge(nInputs, nRounds, nOutputs) {
     outs[i + 1] <== S[nInputs + i].xL_out;
   }
 }
+
+
+
+/*
+
+*** MiMCFeistel(nrounds): template that implements the MiMCFeisel protocol as hash. The circuit receives the inputs xL_in, xR_in to be hashed and the value k, and returns the hash values xL_out, xR_out. The template has as parameter the number of rounds of the protocol.
+        - Inputs: xL_in -> field value
+                  xR_in -> field value
+                  k -> field value
+        - Outputs: xL_out -> field value
+                   xR_out -> field value
+*/
 
 template MiMCFeistel(nrounds) {
     signal input xL_in;

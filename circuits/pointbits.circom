@@ -80,7 +80,7 @@ function sqrt(n) {
 
 /*
 
-*** CheckPointBits_strict(n): template that checks that an input in of 256 correctly encodes a point of the curve in Edwards representation.
+*** CheckPointBits_strict(): template that checks that an input in of 256 correctly encodes a point of the curve in Edwards representation.
         - Inputs: in[256] -> encoding of the point using 256 bits
                            requires tag binary
         - Outputs: none
@@ -108,7 +108,7 @@ template CheckPointBits_strict(){
 
 /*
 
-*** Bits2Pint_Strict(n): template that receives the encoding of a point of a curve using 256 bits and returns its Edwards representation
+*** Bits2Pint_Strict(): template that receives the encoding of a point of a curve using 256 bits and returns its Edwards representation
         - Inputs: in[256] -> encoding of the point using 256 bits 
                            requires tag binary
         - Outputs: out[2] -> curve point using Edwards representation
@@ -171,7 +171,7 @@ template Bits2Point_Strict() {
 
 /*
 
-*** Point2Bits_Strict(n): template that receives a point as an input and returns its encoding using 256 bits
+*** Point2Bits_Strict(): template that receives a point as an input and returns its encoding using 256 bits
         - Inputs: in[2] -> curve point using Edwards representation
         - Outputs: out[256] -> encoding of the point using 256 bits
                                satisfies tag binary

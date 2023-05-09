@@ -16,16 +16,34 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
-pragma circom 2.0.0;
+pragma circom 2.1.5;
 
 include "compconstant.circom";
 include "poseidon.circom";
 include "bitify.circom";
 include "escalarmulany.circom";
 include "escalarmulfix.circom";
+include "tags-specifications.circom";
+
+
+// To consult the tags specifications check tags-specifications.circom
+
+/*
+
+*** EdDSAPoseidonVerifier(): template that implements the EdDSA verification protocol based on poseidon hash. The circuit receives the message that we want to verify and the public and private keys (that are points of a curve in Edwards representation) and checks if the message is correct.
+        - Inputs: msg -> field value
+                  enabled -> bit indicating if the verification is enabled or not
+                             requires tag binary
+                  Ax -> x coodinate of the curve point A that is in Edwards representation
+                  Ay -> y coodinate of the curve point A that is in Edwards representation
+                  S -> field value
+                  R8x ->  x coodinate of the curve point R8 that is in Edwards representation
+                  R8y -> y coodinate of the curve point R8 that is in Edwards representation
+        - Outputs: None
+*/
 
 template EdDSAPoseidonVerifier() {
-    signal input enabled;
+    signal input {binary} enabled;
     signal input Ax;
     signal input Ay;
 
@@ -48,7 +66,7 @@ template EdDSAPoseidonVerifier() {
         snum2bits.out[i] ==> compConstant.in[i];
     }
     compConstant.in[253] <== 0;
-    compConstant.out*enabled === 0;
+    compConstant.out*enabled === 0; // in the eddsa we do not add this condition
 
 // Calculate the h = H(R,A, msg)
 
@@ -60,7 +78,7 @@ template EdDSAPoseidonVerifier() {
     hash.inputs[3] <== Ay;
     hash.inputs[4] <== M;
 
-    component h2bits = Num2Bits_strict();
+    component h2bits = Num2Bits(254);
     h2bits.in <== hash.out;
 
 // Calculate second part of the right side:  right2 = h*8*A
@@ -83,9 +101,7 @@ template EdDSAPoseidonVerifier() {
     isZero.out*enabled === 0;
 
     component mulAny = EscalarMulAny(254);
-    for (i=0; i<254; i++) {
-        mulAny.e[i] <== h2bits.out[i];
-    }
+    mulAny.e <== h2bits.out;
     mulAny.p[0] <== dbl3.xout;
     mulAny.p[1] <== dbl3.yout;
 
@@ -105,9 +121,7 @@ template EdDSAPoseidonVerifier() {
         16950150798460657717958625567821834550301663161624707787222815936182638968203
     ];
     component mulFix = EscalarMulFix(253, BASE8);
-    for (i=0; i<253; i++) {
-        mulFix.e[i] <== snum2bits.out[i];
-    }
+    mulFix.e <== snum2bits.out;
 
 // Do the comparation left == right if enabled;
 

@@ -16,7 +16,20 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
-pragma circom 2.0.0;
+pragma circom 2.1.5;
+include "tags-specifications.circom";
+
+
+// To consult the tags specifications check tags-specifications.circom
+
+
+/*
+
+*** MiMC7(nrounds): template that implements the MiMC7 hash protocol using nrounds. The circuit receives the inputs x_in to be hashed and the value k, and returns the hash value.
+        - Inputs: x_in -> field value
+                  k -> field value
+        - Outputs: out -> field value
+*/
 
 template MiMC7(nrounds) {
     signal input x_in;
@@ -135,6 +148,17 @@ template MiMC7(nrounds) {
         }
     }
 }
+
+
+
+
+/*
+
+*** MultiMiMC7(nInputs, nRounds): template that implements the MiMC7 hash protocol for multiple input signals (nInputs) using nrounds. The circuit receives the inputs in[nInputs] to be hashed and the value k, and returns the hash value.
+        - Inputs: in[nInputs] -> field value
+                  k -> field value
+        - Outputs: out -> field value
+*/
 
 template MultiMiMC7(nInputs, nRounds) {
     signal input in[nInputs];
