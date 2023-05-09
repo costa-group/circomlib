@@ -40,7 +40,8 @@ template T2() {
     component sum = BinSum(32, 2);
     sum.in[0] <== bigsigma0.out;
     sum.in[1] <== maj.out;
-    
-    out <== sum.out;
-    
+
+    for (k=0; k<32; k++) {
+         out[k] <== sum.out[k];
+     }
 }

@@ -44,5 +44,8 @@ template SigmaPlus() {
     sum.in[1] <== in7;
     sum.in[2] <== sigma0.out;
     sum.in[3] <== in16;
-    out <== sum.out;
+    
+    for (k=0; k<32; k++) {
+         out[k] <== sum.out[k];
+    }
 }

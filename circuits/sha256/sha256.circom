@@ -15,7 +15,7 @@ template Sha256(nBits) {
 
     nBlocks = ((nBits + 64)\512)+1;
 
-    signal paddedIn[nBlocks*512];
+    signal {binary} paddedIn[nBlocks*512];
 
     for (k=0; k<nBits; k++) {
         paddedIn[k] <== in[k];
