@@ -159,7 +159,6 @@ template Bits2Point_Strict() {
     babyCheck.y <== out[1];
 
     component signCalc = IsNegative();
-    log(-1 >> 1);
     signCalc.in <== out[0];
 
     signCalc.out === in[255];
