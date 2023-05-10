@@ -36,15 +36,23 @@ out = a*( 1 - 2*b -2*c + 4*mid ) + b + c - 2 * mid
 
 pragma circom 2.0.0;
 
+template Xor3_simple(){
+    signal input {binary} a;
+    signal input {binary} b;
+    signal input {binary} c;
+    signal output {binary} out;
+    signal mid;
+    mid <== b*c;
+    out <== a * (1 -2*b  -2*c +4*mid) + b + c -2*mid;    
+}
+
 template Xor3(n) {
     signal input {binary} a[n];
     signal input {binary} b[n];
     signal input {binary} c[n];
     signal output {binary} out[n];
-    signal mid[n];
 
     for (var k=0; k<n; k++) {
-        mid[k] <== b[k]*c[k];
-        out[k] <== a[k] * (1 -2*b[k]  -2*c[k] +4*mid[k]) + b[k] + c[k] -2*mid[k];
+        out[k] <== Xor3_simple()(a[k],b[k],c[k]);
     }
 }

@@ -18,7 +18,7 @@ template Main() {
     escalarMul.inp[1] <== 1;
 
     for  (i=0; i<256; i++) {
-        in[i] ==> escalarMul.in[i];
+        AddBinaryTag()(in[i]) ==> escalarMul.in[i];
     }
 
     escalarMul.out[0] ==> out[0];

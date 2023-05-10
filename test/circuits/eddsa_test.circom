@@ -10,10 +10,10 @@ template A(n){
     signal input R8[256];
     signal input S[256];
 
-    signal {binary} msg_aux[n] <== msg;
-    signal {binary} A_aux[256] <== A;
-    signal {binary} R8_aux[256] <== R8;
-    signal {binary} S_aux[256] <== S;
+    signal {binary} msg_aux[n] <== AddBinaryArrayTag(n)(msg);
+    signal {binary} A_aux[256] <== AddBinaryArrayTag(256)(A);
+    signal {binary} R8_aux[256] <== AddBinaryArrayTag(256)(R8);
+    signal {binary} S_aux[256] <== AddBinaryArrayTag(256)(S);
     
     EdDSAVerifier(n)(msg_aux, A_aux, R8_aux, S_aux);
 
