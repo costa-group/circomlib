@@ -16,11 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
+
 pragma circom 2.0.0;
 
 include "bitify.circom";
-include "binsum.circom";
 include "gates.circom";
+
 
 template IsZero() {
     signal input in;
@@ -32,6 +33,8 @@ template IsZero() {
 
     out <== -in*inv +1;
     in*out === 0;
+    
+    spec_postcondition out == (in == 0);
 }
 
 
@@ -44,6 +47,8 @@ template IsEqual() {
     in[1] - in[0] ==> isz.in;
 
     isz.out ==> out;
+    
+    spec_postcondition out == (in[0] == in[1]);
 }
 
 template ForceEqualIfEnabled() {
@@ -55,6 +60,8 @@ template ForceEqualIfEnabled() {
     in[1] - in[0] ==> isz.in;
 
     (1 - isz.out)*enabled === 0;
+    
+    spec_postcondition !enabled || (in[0] == in[1]);
 }
 
 /*
@@ -99,6 +106,8 @@ template LessThan(n) {
     n2b.in <== in[0]+ (1<<n) - in[1];
 
     out <== 1-n2b.out[n];
+    
+    spec_postcondition out == (in[0] < in[1]);
 }
 
 
@@ -132,6 +141,8 @@ template LessEqThan(n){
     component nt = NOT();
     nt.in <== gt.out;
     nt.out ==> out;
+    
+    spec_postcondition out == (in[0] <= in[1]);
 
 }
 
@@ -148,6 +159,8 @@ template GreaterThan(n) {
     lt.in[0] <== in[1];
     lt.in[1] <== in[0];
     lt.out ==> out;
+    
+    spec_postcondition out == (in[0] > in[1]);
 }
 
 // N is the number of bits the input  have.
@@ -180,5 +193,9 @@ template GreaterEqThan(n) {
     component nt = NOT();
     nt.in <== gt.out;
     nt.out ==> out;
+    
+    spec_postcondition out == (in[0] >= in[1]);
 }
+
+
 

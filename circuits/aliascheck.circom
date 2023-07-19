@@ -30,4 +30,14 @@ template AliasCheck() {
     for (var i=0; i<254; i++) in[i] ==> compConstant.in[i];
 
     compConstant.out === 0;
+    
+    // specification:
+    var sum_spec = 0;
+    var e2 = 1;
+    for(var i = 0; i < 254; i ++){
+       sum_spec = sum_spec + in[i] * e2;
+       e2 = e2 + e2;
+    }
+    
+    spec_postcondition sum_spec <= 21888242871839275222246405745257275088548364400416034343698204186575808495616;
 }

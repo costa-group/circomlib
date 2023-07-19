@@ -22,6 +22,16 @@ include "comparators.circom";
 include "aliascheck.circom";
 
 
+function nbits(a) {
+    var n = 1;
+    var r = 0;
+    while (n-1<a) {
+        r++;
+        n *= 2;
+    }
+    return r;
+}
+
 template Num2Bits(n) {
     signal input in;
     signal output {binary} out[n];
@@ -36,27 +46,34 @@ template Num2Bits(n) {
     }
     
     lc1 === in;
+    spec_postcondition lc1 == in;
 }
 
 template Num2Bits_strict() {
     signal input in;
     signal output {binary} out[254];
-
-    component aliasCheck = AliasCheck();
-    component n2b = Num2Bits(254);
-    in ==> n2b.in;
-
-    for (var i=0; i<254; i++) {
-        n2b.out[i] ==> out[i];
-        n2b.out[i] ==> aliasCheck.in[i];
+    
+    var lc1=0;
+    var e2=1;
+    for (var i = 0; i<254; i++) {
+        out[i] <-- (in >> i) & 1;
+        out[i] * (out[i] -1 ) === 0;
+        lc1 += out[i] * e2;
+        e2 = e2+e2;
     }
+    lc1 === in;
+
+    AliasCheck()(out);
+    
+    // to generate the postconditions:
+    
+    spec_postcondition lc1 == in;
 }
 
 template Bits2Num(n) {
     signal input {binary} in[n];
     signal output {maxbit} out;
     var lc1=0;
-
     var e2 = 1;
     for (var i = 0; i<n; i++) {
         lc1 += in[i] * e2;
@@ -64,21 +81,32 @@ template Bits2Num(n) {
     }
     out.maxbit = n;
     lc1 ==> out;
+    
+    spec_postcondition out == lc1;
 }
 
 template Bits2Num_strict() {
     signal input {binary} in[254];
     signal output {maxbit} out;
 
-    component aliasCheck = AliasCheck();
-    component b2n = Bits2Num(254);
+    // Option 1: adds the constraints in every situation
+    //AliasCheck()(in);
+    
 
-    for (var i=0; i<254; i++) {
-        in[i] ==> b2n.in[i];
-        in[i] ==> aliasCheck.in[i];
+
+    var lc1 = 0;
+    var e2 = 1;
+    for (var i = 0; i<254; i++) {
+        lc1 += in[i] * e2;
+        e2 = e2 + e2;
     }
     out.maxbit = 254;
-    b2n.out ==> out;
+    lc1 ==> out;
+
+    // Option2: only when we can assume that the input is a valid binary representation
+    spec_precondition lc1 <= 21888242871839275222246405745257275088548364400416034343698204186575808495616;
+    
+    spec_postcondition out == lc1;
 }
 
 template Num2BitsNeg(n) {
@@ -103,4 +131,6 @@ template Num2BitsNeg(n) {
 
 
     lc1 + isZero.out * 2**n === 2**n - in;
+    
+    spec_postcondition (!(in == 0) || (lc1 == 0)) && ((in == 0) || (2 ** n - in == lc1));
 }

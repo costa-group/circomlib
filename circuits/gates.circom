@@ -16,7 +16,11 @@
     You should have received a copy of the GNU General Public License
     along with circom. If not, see <https://www.gnu.org/licenses/>.
 */
+
+
 pragma circom 2.0.0;
+
+include "tags-managing.circom";
 
 template XOR() {
     signal input {binary} a;
@@ -24,6 +28,8 @@ template XOR() {
     signal output {binary} out;
 
     out <== a + b - 2*a*b;
+    
+    spec_postcondition out == ((a && !b) || (!a && b));
 }
 
 template AND() {
@@ -32,6 +38,8 @@ template AND() {
     signal output {binary} out;
 
     out <== a*b;
+    
+    spec_postcondition out == (a && b);
 }
 
 template OR() {
@@ -40,6 +48,8 @@ template OR() {
     signal output {binary} out;
 
     out <== a + b - a*b;
+    
+    spec_postcondition out == (a || b);
 }
 
 template NOT() {
@@ -47,6 +57,8 @@ template NOT() {
     signal output {binary} out;
 
     out <== 1 + in - 2*in;
+    
+    spec_postcondition out == !in;
 }
 
 template NAND() {
@@ -55,6 +67,8 @@ template NAND() {
     signal output {binary} out;
 
     out <== 1 - a*b;
+    
+    spec_postcondition out == !(a && b);
 }
 
 template NOR() {
@@ -63,6 +77,8 @@ template NOR() {
     signal output {binary} out;
 
     out <== a*b + 1 - a - b;
+    
+    spec_postcondition out == !(a || b);
 }
 
 template MultiAND(n) {
@@ -91,6 +107,17 @@ template MultiAND(n) {
         and2.b <== ands[1].out;
         out <== and2.out;
     }
+    
+    // to generate the postcondition and check it
+	    
+    var aux = 1;
+    for(var i = 0; i < n; i++){
+       aux = aux && in[i];
+    }    
+    
+    spec_postcondition out == aux;
 }
+
+
 
 

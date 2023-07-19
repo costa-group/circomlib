@@ -39,4 +39,7 @@ template Switcher() {
     aux <== (R-L)*sel;    // We create aux in order to have only one multiplication
     outL <==  aux + L;
     outR <== -aux + R;
+    
+    spec_postcondition (!(sel == 0)) || ((L == outL) && (R == outR));
+    spec_postcondition (sel == 0) || ((L == outR) && (R == outL));
 }

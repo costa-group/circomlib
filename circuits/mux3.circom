@@ -53,6 +53,21 @@ template MultiMux3(n) {
                      (  a10[i] +  a1[i] +  a0[i] +  a[i] );
 
     }
+    
+    // specification
+    
+    var value_s = s[0] + 2 * s[1] + 4 * s[2];
+    
+    for (var i = 0; i <n; i++){
+        spec_postcondition (!(value_s == 0)) || (out[i] == c[i][0]);
+        spec_postcondition (!(value_s == 1)) || (out[i] == c[i][1]);
+        spec_postcondition (!(value_s == 2)) || (out[i] == c[i][2]);
+        spec_postcondition (!(value_s == 3)) || (out[i] == c[i][3]);
+        spec_postcondition (!(value_s == 4)) || (out[i] == c[i][4]);
+        spec_postcondition (!(value_s == 5)) || (out[i] == c[i][5]);
+        spec_postcondition (!(value_s == 6)) || (out[i] == c[i][6]);
+        spec_postcondition (!(value_s == 7)) || (out[i] == c[i][7]);
+    }
 }
 
 template Mux3() {
@@ -72,4 +87,17 @@ template Mux3() {
     }
 
     mux.out[0] ==> out;
+    
+        // specification
+    
+    var value_s = s[0] + 2 * s[1] + 4 * s[2];
+    
+    spec_postcondition (!(value_s == 0)) || (out == c[0]);
+    spec_postcondition (!(value_s == 1)) || (out == c[1]);
+    spec_postcondition (!(value_s == 2)) || (out == c[2]);
+    spec_postcondition (!(value_s == 3)) || (out == c[3]);
+    spec_postcondition (!(value_s == 4)) || (out == c[4]);
+    spec_postcondition (!(value_s == 5)) || (out == c[5]);
+    spec_postcondition (!(value_s == 6)) || (out == c[6]);
+    spec_postcondition (!(value_s == 7)) || (out == c[7]);
 }

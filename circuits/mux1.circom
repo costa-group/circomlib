@@ -28,6 +28,13 @@ template MultiMux1(n) {
         out[i] <== (c[i][1] - c[i][0])*s + c[i][0];
 
     }
+    
+    // specification
+    
+    for (var i = 0; i <n; i++){
+        spec_postcondition (!(s == 0)) || (out[i] == c[i][0]);
+        spec_postcondition (!(s == 1)) || (out[i] == c[i][1]);
+    }
 }
 
 template Mux1() {
@@ -45,4 +52,7 @@ template Mux1() {
     s ==> mux.s;
 
     mux.out[0] ==> out;
+    
+    spec_postcondition (!(s == 0)) || (out == c[0]);
+    spec_postcondition (!(s == 1)) || (out == c[1]);
 }

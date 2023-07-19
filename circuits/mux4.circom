@@ -97,6 +97,29 @@ template MultiMux4(n) {
 
 */
     }
+    
+    // specification
+    
+    var value_s = s[0] + 2 * s[1] + 4 * s[2] + 8 * s[3];
+    
+    for (var i = 0; i <n; i++){
+        spec_postcondition (!(value_s == 0)) || (out[i] == c[i][0]);
+        spec_postcondition (!(value_s == 1)) || (out[i] == c[i][1]);
+        spec_postcondition (!(value_s == 2)) || (out[i] == c[i][2]);
+        spec_postcondition (!(value_s == 3)) || (out[i] == c[i][3]);
+        spec_postcondition (!(value_s == 4)) || (out[i] == c[i][4]);
+        spec_postcondition (!(value_s == 5)) || (out[i] == c[i][5]);
+        spec_postcondition (!(value_s == 6)) || (out[i] == c[i][6]);
+        spec_postcondition (!(value_s == 7)) || (out[i] == c[i][7]);
+        spec_postcondition (!(value_s == 8)) || (out[i] == c[i][8]);
+        spec_postcondition (!(value_s == 9)) || (out[i] == c[i][9]);
+        spec_postcondition (!(value_s == 10)) || (out[i] == c[i][10]);
+        spec_postcondition (!(value_s == 11)) || (out[i] == c[i][11]);
+        spec_postcondition (!(value_s == 12)) || (out[i] == c[i][12]);
+        spec_postcondition (!(value_s == 13)) || (out[i] == c[i][13]);
+        spec_postcondition (!(value_s == 14)) || (out[i] == c[i][14]);
+        spec_postcondition (!(value_s == 15)) || (out[i] == c[i][15]);
+    }
 }
 
 template Mux4() {
@@ -116,4 +139,25 @@ template Mux4() {
     }
 
     mux.out[0] ==> out;
+    
+    // specification
+    
+    var value_s = s[0] + 2 * s[1] + 4 * s[2] + 8 * s[3];
+    
+    spec_postcondition (!(value_s == 0)) || (out == c[0]);
+    spec_postcondition (!(value_s == 1)) || (out == c[1]);
+    spec_postcondition (!(value_s == 2)) || (out == c[2]);
+    spec_postcondition (!(value_s == 3)) || (out == c[3]);
+    spec_postcondition (!(value_s == 4)) || (out == c[4]);
+    spec_postcondition (!(value_s == 5)) || (out == c[5]);
+    spec_postcondition (!(value_s == 6)) || (out == c[6]);
+    spec_postcondition (!(value_s == 7)) || (out == c[7]);
+    spec_postcondition (!(value_s == 8)) || (out == c[8]);
+    spec_postcondition (!(value_s == 9)) || (out == c[9]);
+    spec_postcondition (!(value_s == 10)) || (out == c[10]);
+    spec_postcondition (!(value_s == 11)) || (out == c[11]);
+    spec_postcondition (!(value_s == 12)) || (out == c[12]);
+    spec_postcondition (!(value_s == 13)) || (out == c[13]);
+    spec_postcondition (!(value_s == 14)) || (out == c[14]);
+    spec_postcondition (!(value_s == 15)) || (out == c[15]);
 }

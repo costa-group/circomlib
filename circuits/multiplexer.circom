@@ -62,6 +62,8 @@ function log2(a) {
 
 pragma circom 2.0.0;
 
+include "comparators.circom";
+
 template EscalarProduct(w) {
     signal input in1[w];
     signal input in2[w];
@@ -73,6 +75,16 @@ template EscalarProduct(w) {
         lc = lc + aux[i];
     }
     out <== lc;
+    
+    
+    // specification:
+    
+    var escalar_prod = 0;
+    for (var i = 0; i < w; i++){
+        escalar_prod = escalar_prod + in1[i] * in2[i];
+    }
+    
+    spec_postcondition (escalar_prod % 21888242871839275222246405745257275088548364400416034343698204186575808495617) == out;
 }
 
 template Decoder(w) {
@@ -89,6 +101,37 @@ template Decoder(w) {
 
     lc ==> success;
     success * (success -1) === 0;
+    
+    // specification
+    spec_postcondition (inp < w) == success;
+    for (var i = 0; i < w; i++){
+       spec_postcondition (!(inp == i)) || (out[i] == 1);
+       spec_postcondition (!(inp != i)) || (out[i] == 0);
+    }
+}
+
+template DecoderFixed(w) {
+    signal input inp;
+    signal output out[w];
+    signal output {binary} success;
+    var lc=0;
+
+    component checkZero[w];
+
+    for (var i=0; i<w; i++) {
+        checkZero[i] = IsZero();
+        checkZero[i].in <== inp - i;
+        out[i] <== checkZero[i].out;
+        lc = lc + out[i];
+    }
+    lc ==> success;
+    
+    // specification
+    spec_postcondition (inp < w) == success;
+    for (var i = 0; i < w; i++){
+       spec_postcondition (!(inp == i)) || (out[i] == 1);
+       spec_postcondition (!(inp != i)) || (out[i] == 0);
+    }
 }
 
 
@@ -96,7 +139,7 @@ template Multiplexer(wIn, nIn) {
     signal input inp[nIn][wIn];
     signal input sel;
     signal output out[wIn];
-    component dec = Decoder(nIn);
+    component dec = DecoderFixed(nIn);
     component ep[wIn];
 
     for (var k=0; k<wIn; k++) {
@@ -112,4 +155,13 @@ template Multiplexer(wIn, nIn) {
         ep[j].out ==> out[j];
     }
     dec.success === 1;
+    
+    // specification
+    spec_postcondition sel < nIn;
+    for (var i = 0; i < nIn; i++){
+       for (var j = 0; j < wIn; j++) {
+           spec_postcondition (!(sel == i)) || (out[j] == inp[i][j]);
+       }
+    }
+    
 }

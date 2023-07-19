@@ -71,4 +71,14 @@ template CompConstant(ct) {
     num2bits.in <== sout;
 
     out <== num2bits.out[127];
+    
+    // specification:
+    var sum_spec = 0;
+    var e2 = 1;
+    for(var i = 0; i < 254; i ++){
+       sum_spec = sum_spec + in[i] * e2;
+       e2 = e2 + e2;
+    }
+    
+    spec_postcondition out == (sum_spec > ct);
 }
