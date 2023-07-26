@@ -40,6 +40,7 @@ template Num2Bits(n) {
     var e2=1;
     for (var i = 0; i<n; i++) {
         out[i] <-- (in >> i) & 1;
+        //spec_postcondition out[i] == ((in >> i) % 2);
         out[i] * (out[i] -1 ) === 0;
         lc1 += out[i] * e2;
         e2 = e2+e2;
@@ -57,6 +58,7 @@ template Num2Bits_strict() {
     var e2=1;
     for (var i = 0; i<254; i++) {
         out[i] <-- (in >> i) & 1;
+        //spec_postcondition out[i] == ((in >> i) % 2);
         out[i] * (out[i] -1 ) === 0;
         lc1 += out[i] * e2;
         e2 = e2+e2;
@@ -112,6 +114,8 @@ template Bits2Num_strict() {
 template Num2BitsNeg(n) {
     signal input in;
     signal output {binary} out[n];
+    
+    signal output nout;
     var lc1=0;
 
     component isZero;
@@ -122,15 +126,17 @@ template Num2BitsNeg(n) {
 
     for (var i = 0; i<n; i++) {
         out[i] <-- (neg >> i) & 1;
+        //spec_postcondition out[i] == ((neg >> i) % 2);
         out[i] * (out[i] -1 ) === 0;
         lc1 += out[i] * 2**i;
     }
 
     in ==> isZero.in;
 
-
+    nout <== isZero.out;
 
     lc1 + isZero.out * 2**n === 2**n - in;
     
-    spec_postcondition (!(in == 0) || (lc1 == 0)) && ((in == 0) || (2 ** n - in == lc1));
+    spec_postcondition ((in == 0) => (lc1 == 0)) && (!(in == 0) => (2 ** n - in == lc1));
+    spec_postcondition nout == (in == 0);
 }

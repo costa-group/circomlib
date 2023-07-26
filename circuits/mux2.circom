@@ -47,10 +47,10 @@ template MultiMux2(n) {
     var value_s = s[0] + 2 * s[1];
     
     for (var i = 0; i <n; i++){
-        spec_postcondition (!(value_s == 0)) || (out[i] == c[i][0]);
-        spec_postcondition (!(value_s == 1)) || (out[i] == c[i][1]);
-        spec_postcondition (!(value_s == 2)) || (out[i] == c[i][2]);
-        spec_postcondition (!(value_s == 3)) || (out[i] == c[i][3]);
+        spec_postcondition ((value_s == 0)) => (out[i] == c[i][0]);
+        spec_postcondition ((value_s == 1)) => (out[i] == c[i][1]);
+        spec_postcondition ((value_s == 2)) => (out[i] == c[i][2]);
+        spec_postcondition ((value_s == 3)) => (out[i] == c[i][3]);
     }
 }
 
@@ -74,8 +74,8 @@ template Mux2() {
     
     var value_s = s[0] + 2 * s[1];
     
-    spec_postcondition (!(value_s == 0)) || (out == c[0]);
-    spec_postcondition (!(value_s == 1)) || (out == c[1]);
-    spec_postcondition (!(value_s == 2)) || (out == c[2]);
-    spec_postcondition (!(value_s == 3)) || (out == c[3]);
+    spec_postcondition ((value_s == 0)) => (out == c[0]);
+    spec_postcondition ((value_s == 1)) => (out == c[1]);
+    spec_postcondition ((value_s == 2)) => (out == c[2]);
+    spec_postcondition ((value_s == 3)) => (out == c[3]);
 }

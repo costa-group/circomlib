@@ -45,6 +45,8 @@ template AddBinaryTag () {
 
     in * (in - 1) === 0;
     out <== in;
+    
+    spec_postcondition in == out;
 }
 
 /*
@@ -65,6 +67,7 @@ template AddBinaryArrayTag(n) {
 
     for (var i = 0; i < n; i++) {
     	out[i] <== AddBinaryTag()(in[i]);
+    	spec_postcondition in[i] == out[i];
     }
 }
 
@@ -85,6 +88,8 @@ template ForceBinary() {
     signal output {binary} out;
 
     out <== in;
+    
+    spec_postcondition in == out;
 }
 
 /*
@@ -104,6 +109,10 @@ template ForceBinaryArray(n) {
     signal output {binary} out[n];
 
     out <== in;
+    
+    for(var i = 0; i < n; i++){
+        spec_postcondition in[i] == out[i];
+    }
 }
 
 /*
@@ -126,6 +135,8 @@ template AddMaxbitTag(n) {
 
     out.maxbit = n;
     out <== in;
+    
+    spec_postcondition in == out;
 }
 
 /*
@@ -149,6 +160,7 @@ template AddMaxbitArrayTag(n,m) {
 
     for (var i = 0; i < m; i++) {
        out[i] <== AddMaxbitTag(n)(in[i]);
+       spec_postcondition in[i] == out[i];
     }
     
 }
@@ -171,6 +183,8 @@ template ForceMaxbit(n) {
 
     out.maxbit = n;
     in ==> out;
+    
+    spec_postcondition in == out;
 }
 
 /*
@@ -191,6 +205,10 @@ template ForceMaxbitArray(n,m) {
     out.maxbit = n;
     
     in ==> out;
+    
+    for(var i = 0; i < n; i++){
+        spec_postcondition in[i] == out[i];
+    }
 }
 
 
@@ -219,6 +237,9 @@ template AddMaxValueTag(n) {
     out1 === 1;
     out.max = n;
     out <== in;
+    
+    spec_postcondition in == out;
+    
 }
 
 /*
@@ -249,6 +270,8 @@ template AddMaxAbsValueTag(n){
     
     out.max_abs = n;
     out <== in;
+    
+    spec_postcondition in == out;
 }
 
 

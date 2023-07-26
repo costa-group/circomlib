@@ -71,4 +71,5 @@ template BinSub(n) {
 
     // Ensure the sum;
     lin === lout;
+    spec_postcondition lin == lout;
 }
