@@ -233,21 +233,22 @@ template AddMaxValueTag(n) {
           
 */
 
-template AddMaxAbsValueTag(n){
+
+template AddMaxbitAbsTag(n){
     signal input in;
-    signal output {max_abs} out;
-    
-    var needed_bits = nbits(2 * n);
-    
+    signal output {maxbit_abs} out;
+
+    var needed_bits = n+1;
+
     signal {maxbit} aux[2];
     aux.maxbit = needed_bits;
-    aux[0] <== AddMaxbitTag(needed_bits)(in + n); // to ensure that 0 <= aux[0] < 2**nbits(2 * n)
-    aux[1] <== 2 * n;
+    aux[0] <== AddMaxbitTag(needed_bits)(in + 2**n); // to ensure that 0 <= aux[0] < 2**nbits(2 * n)
+    aux[1] <== 2**(n+1);
 
-    signal out1 <== LessEqThan(n)(aux); // checks that 0 <= in + n <= 2 * n <==> -n <= in <= n
+    signal out1 <== LessEqThan(needed_bits)(aux); // checks that 0 <= in + n <= 2 * n <==> -n <= in <= n
     out1 === 1;
-    
-    out.max_abs = n;
+
+    out.maxbit_abs = n;
     out <== in;
 }
 
