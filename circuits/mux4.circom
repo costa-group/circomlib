@@ -50,6 +50,11 @@ template MultiMux4(n) {
     s21 <== s[2] * s[1];
     signal s210;
     s210 <==  s21 * s[0];
+    
+    spec_precondition (s[0] == 0 || s[1] == 0) => s10 == 0;
+    spec_precondition (s[0] == 0 || s[2] == 0) => s20 == 0;
+    spec_precondition (s[2] == 0 || s[1] == 0) => s21 == 0;
+    spec_precondition (s[0] == 0 || s[1] == 0|| s[2] == 0) => s210 == 0;
 
 
     for (var i=0; i<n; i++) {
@@ -72,30 +77,13 @@ template MultiMux4(n) {
            a1[i] <==  ( c[i][ 2]-c[i][ 0] ) * s[1];
            a0[i] <==  ( c[i][ 1]-c[i][ 0] ) * s[0];
             a[i] <==  ( c[i][ 0] );
+          
+       
 
+          
           out[i] <== ( a3210[i] + a321[i] + a320[i] + a310[i] + a32[i] + a31[i] + a30[i] + a3[i] ) * s[3] +
                      (  a210[i] +  a21[i] +  a20[i] +  a10[i] +  a2[i] +  a1[i] +  a0[i] +  a[i] );
-
-/*
-        out[i] <== (  s210 * ( c[i][15]-c[i][14]-c[i][13]+c[i][12] - c[i][11]+c[i][10]+c[i][ 9]-c[i][ 8]
-                              -c[i][ 7]+c[i][ 6]+c[i][ 5]-c[i][ 4] + c[i][ 3]-c[i][ 2]-c[i][ 1]+c[i][ 0] ) +
-                       s21 * ( c[i][14]-c[i][12]-c[i][10]+c[i][ 8] - c[i][ 6]+c[i][ 4]+c[i][ 2]-c[i][ 0] ) +
-                       s20 * ( c[i][13]-c[i][12]-c[i][ 9]+c[i][ 8] - c[i][ 5]+c[i][ 4]+c[i][ 1]-c[i][ 0] ) +
-                       s10 * ( c[i][11]-c[i][10]-c[i][ 9]+c[i][ 8] - c[i][ 3]+c[i][ 2]+c[i][ 1]-c[i][ 0] ) +
-                      s[2] * ( c[i][12]-c[i][ 8]-c[i][ 4]+c[i][ 0] ) +
-                      s[1] * ( c[i][10]-c[i][ 8]-c[i][ 2]+c[i][ 0] ) +
-                      s[0] * ( c[i][ 9]-c[i][ 8]-c[i][ 1]+c[i][ 0] ) +
-                             ( c[i][ 8]-c[i][ 0] ) ) * s[3]  +
-                (     s210 * ( c[i][ 7]-c[i][ 6]-c[i][ 5]+c[i][ 4] - c[i][ 3]+c[i][ 2]+c[i][ 1]-c[i][ 0] ) +
-                       s21 * ( c[i][ 6]-c[i][ 4]-c[i][ 2]+c[i][ 0] ) +
-                       s20 * ( c[i][ 5]-c[i][ 4]-c[i][ 1]+c[i][ 0] ) +
-                       s10 * ( c[i][ 3]-c[i][ 2]-c[i][ 1]+c[i][ 0] ) +
-                      s[2] * ( c[i][ 4]-c[i][ 0] ) +
-                      s[1] * ( c[i][ 2]-c[i][ 0] ) +
-                      s[0] * ( c[i][ 1]-c[i][ 0] ) +
-                             ( c[i][ 0] ));
-
-*/
+                   
     }
     
     // specification
@@ -113,14 +101,18 @@ template MultiMux4(n) {
         spec_postcondition ((s[0] == 1 && s[1] == 0 && s[2] == 1 && s[3] == 0)) => (out[i] == c[i][5]);
         spec_postcondition ((s[0] == 0 && s[1] == 1 && s[2] == 1 && s[3] == 0)) => (out[i] == c[i][6]);
         spec_postcondition ((s[0] == 1 && s[1] == 1 && s[2] == 1 && s[3] == 0)) => (out[i] == c[i][7]);
+        
         spec_postcondition ((s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 1)) => (out[i] == c[i][8]);
+        
         spec_postcondition ((s[0] == 1 && s[1] == 0 && s[2] == 0 && s[3] == 1)) => (out[i] == c[i][9]);
+        
         spec_postcondition ((s[0] == 0 && s[1] == 1 && s[2] == 0 && s[3] == 1)) => (out[i] == c[i][10]);
         spec_postcondition ((s[0] == 1 && s[1] == 1 && s[2] == 0 && s[3] == 1)) => (out[i] == c[i][11]);
         spec_postcondition ((s[0] == 0 && s[1] == 0 && s[2] == 1 && s[3] == 1)) => (out[i] == c[i][12]);
         spec_postcondition ((s[0] == 1 && s[1] == 0 && s[2] == 1 && s[3] == 1)) => (out[i] == c[i][13]);
         spec_postcondition ((s[0] == 0 && s[1] == 1 && s[2] == 1 && s[3] == 1)) => (out[i] == c[i][14]);
         spec_postcondition ((s[0] == 1 && s[1] == 1 && s[2] == 1 && s[3] == 1)) => (out[i] == c[i][15]);
+        
 
     }
     }

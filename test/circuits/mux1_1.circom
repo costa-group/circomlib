@@ -10,6 +10,9 @@ template Constants() {
 
     out[0] <== 37;
     out[1] <== 47;
+    
+    spec_postcondition out[0] == 37;
+    spec_postcondition out[1] == 47;
 }
 
 template Main() {
@@ -28,6 +31,10 @@ template Main() {
     }
 
     mux.out ==> out;
+    
+    spec_postcondition (selector == 0) => (out == 37); 
+    spec_postcondition (selector == 1) => (out == 47); 
+    spec_postcondition (0 <= selector) && (selector <= 1);
 }
 
 component main = Main();

@@ -16,6 +16,15 @@ template Constants() {
     out[5] <== 107;
     out[6] <== 163;
     out[7] <== 191;
+    
+        spec_postcondition out[0] == 37;
+    spec_postcondition out[1] == 47;
+    spec_postcondition out[2] == 53;
+    spec_postcondition out[3] == 71;
+    spec_postcondition out[4] == 89;
+    spec_postcondition out[5] == 107;
+    spec_postcondition out[6] == 163;
+    spec_postcondition out[7] == 191;
 }
 
 template Main() {
@@ -36,6 +45,16 @@ template Main() {
     }
 
     mux.out ==> out;
+    
+    spec_postcondition (selector == 0) => (out == 37); 
+    spec_postcondition (selector == 1) => (out == 47); 
+    spec_postcondition (selector == 2) => (out == 53); 
+    spec_postcondition (selector == 3) => (out == 71); 
+    spec_postcondition (selector == 4) => (out == 89); 
+    spec_postcondition (selector == 5) => (out == 107); 
+    spec_postcondition (selector == 6) => (out == 163); 
+    spec_postcondition (selector == 7) => (out == 191); 
+    spec_postcondition (0 <= selector) && (selector <= 7);
 }
 
 component main = Main();

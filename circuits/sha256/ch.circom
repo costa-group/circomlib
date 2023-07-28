@@ -43,5 +43,7 @@ template Ch_t(n) {
 
     for (var k=0; k<n; k++) {
         out[k] <== a[k] * (b[k]-c[k]) + c[k];
+        spec_postcondition out[k] == a[k] * (b[k]-c[k]) + c[k];
     }
+    
 }
