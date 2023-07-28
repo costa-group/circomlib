@@ -106,6 +106,8 @@ template Window4() {
 
     out[0] <== mux.out[0];
     out[1] <== - mux.out[1]*2*in[3] + mux.out[1];  // Negate y if in[3] is one
+    spec_postcondition (in[3] == 0 => out[0]);
+    spec_postcondition (!(in[3] == 1) || (out[0] == 21888242871839275222246405745257275088548364400416034343698204186575808495617 - out[1]));   
 }
 
 

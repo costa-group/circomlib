@@ -82,7 +82,7 @@ template Bits2Num(n) {
         e2 = e2 + e2;
     }
     out.maxbit = n;
-    lc1 ==> out;
+    lc1 ==> out ;
     
     spec_postcondition out == lc1 % 21888242871839275222246405745257275088548364400416034343698204186575808495617;
 }
