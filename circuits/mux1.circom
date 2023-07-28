@@ -32,8 +32,8 @@ template MultiMux1(n) {
     // specification
     
     for (var i = 0; i <n; i++){
-        spec_postcondition (!(s == 0)) || (out[i] == c[i][0]);
-        spec_postcondition (!(s == 1)) || (out[i] == c[i][1]);
+        spec_postcondition ((s == 0)) => (out[i] == c[i][0]);
+        spec_postcondition ((s == 1)) => (out[i] == c[i][1]);
     }
 }
 
@@ -53,6 +53,6 @@ template Mux1() {
 
     mux.out[0] ==> out;
     
-    spec_postcondition (!(s == 0)) || (out == c[0]);
-    spec_postcondition (!(s == 1)) || (out == c[1]);
+    spec_postcondition ((s == 0)) => (out == c[0]);
+    spec_postcondition ((s == 1)) => (out == c[1]);
 }

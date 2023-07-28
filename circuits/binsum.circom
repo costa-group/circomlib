@@ -86,6 +86,7 @@ template BinSum(n, ops) {
     e2 = 1;
     for (k=0; k<nout; k++) {
         out[k] <-- (lin >> k) & 1;
+        //spec_postcondition out[k] == ((lin >> k) % 2);
 
         // Ensure out is binary
         out[k] * (out[k] - 1) === 0;
@@ -98,4 +99,5 @@ template BinSum(n, ops) {
     // Ensure the sum;
 
     lin === lout;
+    spec_postcondition lin == lout;
 }

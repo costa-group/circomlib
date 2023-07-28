@@ -36,21 +36,44 @@ template MultiMux3(n) {
     // 4 constrains for the intermediary variables
     signal  s10;
     s10 <== s[1] * s[0];
+    
+    //spec_postcondition s10 == (s[1] && s[0]);
 
     for (var i=0; i<n; i++) {
 
          a210[i] <==  ( c[i][ 7]-c[i][ 6]-c[i][ 5]+c[i][ 4] - c[i][ 3]+c[i][ 2]+c[i][ 1]-c[i][ 0] ) * s10;
+         //spec_postcondition (s[1] && s[0]) => (a210[i] == (c[i][ 7]-c[i][ 6]-c[i][ 5]+c[i][ 4] - c[i][ 3]+c[i][ 2]+c[i][ 1]-c[i][ 0]) % 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!(s[1] && s[0])) => (a210[i] == 0);
+         
           a21[i] <==  ( c[i][ 6]-c[i][ 4]-c[i][ 2]+c[i][ 0] ) * s[1];
-          a20[i] <==  ( c[i][ 5]-c[i][ 4]-c[i][ 1]+c[i][ 0] ) * s[0];
-           a2[i] <==  ( c[i][ 4]-c[i][ 0] );
+         //spec_postcondition (s[1]) => (a21[i] == (c[i][ 6]-c[i][ 4]-c[i][ 2]+c[i][ 0])% 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!s[1]) => (a21[i] == 0);
+          
+          a20[i] <==  ( c[i][ 5]-c[i][ 4]-c[i][ 1]+c[i][ 0] ) * s[0];           
+         //spec_postcondition (s[0]) => (a20[i] == ( c[i][ 5]-c[i][ 4]-c[i][ 1]+c[i][ 0] )% 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!s[0]) => (a20[i] == 0);
+         
+         a2[i] <==  ( c[i][ 4]-c[i][ 0] );
 
           a10[i] <==  ( c[i][ 3]-c[i][ 2]-c[i][ 1]+c[i][ 0] ) * s10;
+          //spec_postcondition (s[1] && s[0]) => (a10[i] == (c[i][ 3]-c[i][ 2]-c[i][ 1]+c[i][ 0]) % 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!(s[1] && s[0])) => (a10[i] == 0);
+         
            a1[i] <==  ( c[i][ 2]-c[i][ 0] ) * s[1];
+           //spec_postcondition (s[1]) => (a1[i] == (c[i][ 2]-c[i][ 0]) % 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!(s[1])) => (a1[i] == 0);
+         
            a0[i] <==  ( c[i][ 1]-c[i][ 0] ) * s[0];
+           //spec_postcondition (s[0]) => (a0[i] == (c[i][ 1]-c[i][ 0]) % 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!(s[0])) => (a0[i] == 0);
+         
             a[i] <==  ( c[i][ 0] );
 
           out[i] <== ( a210[i] + a21[i] + a20[i] + a2[i] ) * s[2] +
                      (  a10[i] +  a1[i] +  a0[i] +  a[i] );
+          
+         //spec_postcondition (s[2]) => (out[i] == ( a210[i] + a21[i] + a20[i] + a2[i] + a10[i] +  a1[i] +  a0[i] +  a[i] ) % 21888242871839275222246405745257275088548364400416034343698204186575808495617);
+         //spec_postcondition (!s[2]) => (out[i] == (  a10[i] +  a1[i] +  a0[i] +  a[i] ) % 21888242871839275222246405745257275088548364400416034343698204186575808495617);
 
     }
     
@@ -59,14 +82,15 @@ template MultiMux3(n) {
     var value_s = s[0] + 2 * s[1] + 4 * s[2];
     
     for (var i = 0; i <n; i++){
-        spec_postcondition (!(value_s == 0)) || (out[i] == c[i][0]);
-        spec_postcondition (!(value_s == 1)) || (out[i] == c[i][1]);
-        spec_postcondition (!(value_s == 2)) || (out[i] == c[i][2]);
-        spec_postcondition (!(value_s == 3)) || (out[i] == c[i][3]);
-        spec_postcondition (!(value_s == 4)) || (out[i] == c[i][4]);
-        spec_postcondition (!(value_s == 5)) || (out[i] == c[i][5]);
-        spec_postcondition (!(value_s == 6)) || (out[i] == c[i][6]);
-        spec_postcondition (!(value_s == 7)) || (out[i] == c[i][7]);
+        spec_postcondition ((s[0] == 0 && s[1] == 0 && s[2] == 0)) => (out[i] == c[i][0]);
+        spec_postcondition ((s[0] == 1 && s[1] == 0 && s[2] == 0)) => (out[i] == c[i][1]);
+        spec_postcondition ((s[0] == 0 && s[1] == 1 && s[2] == 0)) => (out[i] == c[i][2]);
+        spec_postcondition ((s[0] == 1 && s[1] == 1 && s[2] == 0)) => (out[i] == c[i][3]);
+        spec_postcondition ((s[0] == 0 && s[1] == 0 && s[2] == 1)) => (out[i] == c[i][4]);
+        spec_postcondition ((s[0] == 1 && s[1] == 0 && s[2] == 1)) => (out[i] == c[i][5]);
+        spec_postcondition ((s[0] == 0 && s[1] == 1 && s[2] == 1)) => (out[i] == c[i][6]);
+        spec_postcondition ((s[0] == 1 && s[1] == 1 && s[2] == 1)) => (out[i] == c[i][7]);
+
     }
 }
 
@@ -92,12 +116,12 @@ template Mux3() {
     
     var value_s = s[0] + 2 * s[1] + 4 * s[2];
     
-    spec_postcondition (!(value_s == 0)) || (out == c[0]);
-    spec_postcondition (!(value_s == 1)) || (out == c[1]);
-    spec_postcondition (!(value_s == 2)) || (out == c[2]);
-    spec_postcondition (!(value_s == 3)) || (out == c[3]);
-    spec_postcondition (!(value_s == 4)) || (out == c[4]);
-    spec_postcondition (!(value_s == 5)) || (out == c[5]);
-    spec_postcondition (!(value_s == 6)) || (out == c[6]);
-    spec_postcondition (!(value_s == 7)) || (out == c[7]);
+    spec_postcondition ((value_s == 0)) => (out == c[0]);
+    spec_postcondition ((value_s == 1)) => (out == c[1]);
+    spec_postcondition ((value_s == 2)) => (out == c[2]);
+    spec_postcondition ((value_s == 3)) => (out == c[3]);
+    spec_postcondition ((value_s == 4)) => (out == c[4]);
+    spec_postcondition ((value_s == 5)) => (out == c[5]);
+    spec_postcondition ((value_s == 6)) => (out == c[6]);
+    spec_postcondition ((value_s == 7)) => (out == c[7]);
 }

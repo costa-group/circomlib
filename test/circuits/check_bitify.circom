@@ -18,7 +18,9 @@ template check_components(n){
    signal output b2ns <== Bits2Num_strict()(AddBinaryArrayTag(254)(in3));
    
    
-   signal output n2bn[n] <== Num2BitsNeg(n)(in1);
+   signal output n2bn[n];
+   signal output aux;
+   (n2bn, aux) <== Num2BitsNeg(n)(in1);
    
 }
 
