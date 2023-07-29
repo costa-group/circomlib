@@ -24,5 +24,7 @@ template RotR(n, r) {
 
     for (var i=0; i<n; i++) {
         out[i] <== in[ (i+r)%n ];
+        spec_postcondition out[i] == in[ (i+r) % n ];
     }
+    
 }

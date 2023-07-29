@@ -42,4 +42,8 @@ template Xor3(n) {
         mid[k] <== b[k]*c[k];
         out[k] <== a[k] * (1 -2*b[k]  -2*c[k] +4*mid[k]) + b[k] + c[k] -2*mid[k];
     }
+    
+    for (var k = 0; k < n ; k++){
+    	spec_postcondition out[k] == (a[k] || b[k] || c[k]);
+    }
 }

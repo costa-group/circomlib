@@ -41,5 +41,6 @@ template Maj_t(n) {
     for (var k=0; k<n; k++) {
         mid[k] <== b[k]*c[k];
         out[k] <== a[k] * (b[k]+c[k]-2*mid[k]) + mid[k];
+        spec_postcondition out[k] == ((a[k] && b[k]) || (b[k] && c[k]) || (a[k] && c[k]));
     }
 }

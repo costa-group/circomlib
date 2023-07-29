@@ -29,5 +29,12 @@ template ShR(n, r) {
             out[i] <== in[ i+r ];
         }
     }
+    
+    for (var i = 0; i < n - r ; i++){
+        spec_postcondition out[i] == in[i + r];   
+     }
+    for (var i = n - r; i < n; i++){
+        spec_postcondition out[i] == 0;   
+     }
 }
 

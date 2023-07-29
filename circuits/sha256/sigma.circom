@@ -22,6 +22,8 @@ include "xor3.circom";
 include "rotate.circom";
 include "shift.circom";
 
+// rotates ra in, rb in and rc shiftr and if one of them is true then true 
+
 template SmallSigma(ra, rb, rc) {
     signal input {binary} in[32];
     signal output {binary} out[32];
@@ -48,6 +50,8 @@ template SmallSigma(ra, rb, rc) {
         out[k] <== xor3.out[k];
     }
 }
+
+// rotates ra in, rb in and rc and if one of them is true then true 
 
 template BigSigma(ra, rb, rc) {
     signal input {binary} in[32];

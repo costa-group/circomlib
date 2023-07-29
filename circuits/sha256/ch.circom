@@ -43,7 +43,14 @@ template Ch_t(n) {
 
     for (var k=0; k<n; k++) {
         out[k] <== a[k] * (b[k]-c[k]) + c[k];
-        spec_postcondition out[k] == a[k] * (b[k]-c[k]) + c[k];
+        spec_postcondition (a[k] == 0 && b[k] == 0 && c[k] == 0) => (out[k] == 0);
+        spec_postcondition (a[k] == 0 && b[k] == 0 && c[k] == 1) => (out[k] == 1);
+        spec_postcondition (a[k] == 0 && b[k] == 1 && c[k] == 0) => (out[k] == 0);
+        spec_postcondition (a[k] == 0 && b[k] == 1 && c[k] == 1) => (out[k] == 1);
+        spec_postcondition (a[k] == 1 && b[k] == 0 && c[k] == 0) => (out[k] == 0);
+        spec_postcondition (a[k] == 1 && b[k] == 0 && c[k] == 1) => (out[k] == 0);
+        spec_postcondition (a[k] == 1 && b[k] == 1 && c[k] == 0) => (out[k] == 1);
+        spec_postcondition (a[k] == 1 && b[k] == 1 && c[k] == 1) => (out[k] == 1);
     }
     
 }
