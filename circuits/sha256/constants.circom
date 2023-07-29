@@ -31,6 +31,7 @@ template H(x) {
 
     for (var i=0; i<32; i++) {
         out[i] <== (c[x] >> i) & 1;
+        spec_postcondition out[i] == (c[x] >> i) % 2;
     }
 }
 
@@ -49,5 +50,6 @@ template K(x) {
 
     for (var i=0; i<32; i++) {
         out[i] <== (c[x] >> i) & 1;
+        spec_postcondition out[i] == (c[x] >> i) % 2;
     }
 }

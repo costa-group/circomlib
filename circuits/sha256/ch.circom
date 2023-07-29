@@ -35,6 +35,24 @@ out = a*(b-c) + c
 */
 pragma circom 2.0.0;
 
+
+template Ch_t_aux(){
+   signal input {binary} a;
+   signal input {binary} b;
+   signal input {binary} c;
+   signal output {binary} out;
+   
+   out <== a * (b-c) + c;
+   spec_postcondition (a == 0 && b == 0 && c == 0) => (out == 0);
+   spec_postcondition (a == 0 && b == 0 && c == 1) => (out == 1);
+   spec_postcondition (a == 0 && b == 1 && c == 0) => (out == 0);
+   spec_postcondition (a == 0 && b == 1 && c == 1) => (out == 1);
+   spec_postcondition (a == 1 && b == 0 && c == 0) => (out == 0);
+   spec_postcondition (a == 1 && b == 0 && c == 1) => (out == 0);
+   spec_postcondition (a == 1 && b == 1 && c == 0) => (out == 1);
+   spec_postcondition (a == 1 && b == 1 && c == 1) => (out == 1);
+}
+
 template Ch_t(n) {
     signal input {binary} a[n];
     signal input {binary} b[n];
@@ -42,7 +60,7 @@ template Ch_t(n) {
     signal output {binary} out[n];
 
     for (var k=0; k<n; k++) {
-        out[k] <== a[k] * (b[k]-c[k]) + c[k];
+        out[k] <== Ch_t_aux()(a[k], b[k], c[k]);
         spec_postcondition (a[k] == 0 && b[k] == 0 && c[k] == 0) => (out[k] == 0);
         spec_postcondition (a[k] == 0 && b[k] == 0 && c[k] == 1) => (out[k] == 1);
         spec_postcondition (a[k] == 0 && b[k] == 1 && c[k] == 0) => (out[k] == 0);

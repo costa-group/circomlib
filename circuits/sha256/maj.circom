@@ -31,6 +31,20 @@ out = a*( b + c - 2*mid ) + mid
 */
 pragma circom 2.0.0;
 
+
+template Maj_t_aux(){
+    signal input {binary} a;
+    signal input {binary} b;
+    signal input {binary} c;
+    signal output {binary} out;
+    signal {binary} mid;
+    
+    mid <== b*c;
+    out <== a * (b+c-2*mid) + mid;
+    spec_postcondition out == ((a && b) || (b && c) || (a && c));
+
+}
+
 template Maj_t(n) {
     signal input {binary} a[n];
     signal input {binary} b[n];
@@ -39,8 +53,7 @@ template Maj_t(n) {
     signal {binary} mid[n];
 
     for (var k=0; k<n; k++) {
-        mid[k] <== b[k]*c[k];
-        out[k] <== a[k] * (b[k]+c[k]-2*mid[k]) + mid[k];
+        out[k] <== Maj_t_aux()(a[k], b[k], c[k]);
         spec_postcondition out[k] == ((a[k] && b[k]) || (b[k] && c[k]) || (a[k] && c[k]));
     }
 }
