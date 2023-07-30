@@ -74,6 +74,9 @@ a parent with a sibling != 0.
  */
  pragma circom 2.0.0;
 
+
+include "../comparators.circom";
+
 template SMTLevIns(nLevels) {
     signal input {binary} enabled;
     signal input siblings[nLevels];
@@ -100,4 +103,22 @@ template SMTLevIns(nLevels) {
     }
 
     levIns[0] <== (1-done[0]);
+    //spec_postcondition siblings[nLevels-1] != 0;
+    spec_postcondition (enabled == 0) || siblings[nLevels-1] == 0;
+    for(var i = 1; i < nLevels; i++){
+        for(var j = nLevels-2; j >= i; j--){
+            spec_postcondition (levIns[i] == 1 ) => (siblings[j] == 0);
+        }
+        spec_postcondition ((levIns[i] == 1) => (siblings[i-1] != 0));
+    }
 }
+
+template smt_levins(n){
+    signal input in;
+    signal {binary} aux <== in;
+    signal input siblings[n];
+    aux*(aux-1)=== 0;
+    signal output {binary} levIns[n];
+    levIns <== SMTLevIns(n)(aux,siblings);   
+}
+component main = smt_levins(10);
