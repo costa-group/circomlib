@@ -32,19 +32,30 @@ out = a*( 1 - 2*b -2*c + 4*mid ) + b + c - 2 * mid
 pragma circom 2.0.0;
 
 
+template Xor3_aux(){
+    signal input {binary} a;
+    signal input {binary} b;
+    signal input {binary} c;
+    signal output {binary} out;
+    signal {binary} mid;
+
+    mid <== b*c;
+    out <== a * (1 -2*b  -2*c +4*mid) + b + c -2*mid; 
+    
+    spec_postcondition out == ((a && !b && !c ) || (!a && b && !c ) || (!a && !b && c ) || (a && b && c));     
+
+}
+
 template Xor3(n) {
     signal input {binary} a[n];
     signal input {binary} b[n];
     signal input {binary} c[n];
     signal output {binary} out[n];
-    signal {binary} mid[n];
 
     for (var k=0; k<n; k++) {
-        mid[k] <== b[k]*c[k];
-        out[k] <== a[k] * (1 -2*b[k]  -2*c[k] +4*mid[k]) + b[k] + c[k] -2*mid[k];
+        out[k] <== Xor3_aux()(a[k], b[k], c[k]);
+        spec_postcondition out[k] == ((a[k] && !b[k] && !c[k] ) || (!a[k] && b[k] && !c[k] ) || (!a[k] && !b[k] && c[k] ) || (a[k] && b[k] && c[k])); 
     }
-    
-    for (var k = 0; k < n ; k++){
-    	spec_postcondition out[k] == (a[k] || b[k] || c[k]);
-    }
+
 }
+
