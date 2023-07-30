@@ -59,6 +59,7 @@ The end of the last level will have to be `na`
  */
  pragma circom 2.0.0;
 
+include "../tags-managing.circom";
 
 template SMTVerifierSM() {
     signal input {binary} is0;
@@ -103,4 +104,26 @@ template SMTVerifierSM() {
     st_i0 <== prev_top_lev_ins * is0;
 
     st_na <== prev_na + prev_inew + prev_iold + prev_i0;
+
+    spec_postcondition levIns == 0 => st_top == prev_top;
+    spec_postcondition (levIns ==1 &&  fnc == 0) => st_inew == prev_top;
+    spec_postcondition (levIns ==1 &&  fnc == 1 &&  is0 == 0) => st_iold == prev_top;
+    spec_postcondition (levIns ==1 &&  fnc == 1 &&  is0 == 1) => st_i0 == prev_top;
+    //spec_postcondition (st_na == prev_i0 || st_na == prev_inew 
+    //                                     || st_na == prev_na || st_na == prev_iold);
 }
+
+template main_verifiersm(){
+    signal input is0;
+    signal input  levIns;
+    signal input fnc;
+
+    signal input prev_top;
+    signal input prev_i0;
+    signal input prev_iold;
+    signal input prev_inew;
+    signal input prev_na;
+    (_,_,_,_,_) <== SMTVerifierSM()(AddBinaryTag()(is0),AddBinaryTag()(levIns),AddBinaryTag()(fnc), prev_top, prev_i0, prev_iold, prev_inew, prev_na);
+}
+
+component main = main_verifiersm();

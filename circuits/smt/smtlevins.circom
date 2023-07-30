@@ -103,13 +103,15 @@ template SMTLevIns(nLevels) {
     }
 
     levIns[0] <== (1-done[0]);
-    //spec_postcondition siblings[nLevels-1] != 0;
+
     spec_postcondition (enabled == 0) || siblings[nLevels-1] == 0;
-    for(var i = 1; i < nLevels; i++){
-        for(var j = nLevels-2; j >= i; j--){
+    for(var i = 0; i < nLevels; i++){
+        for(var j = nLevels-2; j >= i; j--){ //nLevels-1?
             spec_postcondition (levIns[i] == 1 ) => (siblings[j] == 0);
         }
-        spec_postcondition ((levIns[i] == 1) => (siblings[i-1] != 0));
+        if(i > 0){
+            spec_postcondition ((levIns[i] == 1) => (siblings[i-1] != 0));
+        }
     }
 }
 
@@ -121,4 +123,3 @@ template smt_levins(n){
     signal output {binary} levIns[n];
     levIns <== SMTLevIns(n)(aux,siblings);   
 }
-component main = smt_levins(10);
