@@ -50,7 +50,6 @@ template Maj_t(n) {
     signal input {binary} b[n];
     signal input {binary} c[n];
     signal output {binary} out[n];
-    signal {binary} mid[n];
 
     for (var k=0; k<n; k++) {
         out[k] <== Maj_t_aux()(a[k], b[k], c[k]);
