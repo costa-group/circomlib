@@ -67,43 +67,6 @@ template BinaryCheckArray(n) {
     }
 }
 
-/*
-*** ForceBinary(n): template that adds the tag binary to a signal without adding the constraints needed to ensure that the signal is binary
-        - Inputs: in -> field value
-        - Output: out -> same value as in, but including binary tag
-                         DOES NOT CHECK THAT out satisfies tag binary
-         
-    Example: ForceBinary()(5) = 5
-    Note: the template does not check if the input actually satisfies the binary specification --> Use carefully, potentially dangerous template
-          For instance, ForceBinary()(10) = 10, including tag binary
-          
-*/
-
-template ForceBinary() {
-    signal input in;
-    signal output {binary} out;
-
-    out <== in;
-}
-
-/*
-*** ForceBinaryArray(n): template that adds the tag binary to an array of n signals without adding the constraints needed to ensure that the signals are binary
-        - Inputs: in[n] -> array of field values
-        - Output: out[n] -> same value as in, but including binary tag
-                         DOES NOT CHECK THAT out satisfies tag binary
-         
-    Example: ForceBinaryArray()([1,0]) = [1, 0], including tag binary
-    Note: the template does not check if the input actually satisfies the binary specification --> Use carefully, potentially dangerous template
-          For instance, ForceBinaryArray()([0, 10]) = [0, 10], including tag binary
-          
-*/
-
-template ForceBinaryArray(n) {
-    signal input in[n];
-    signal output {binary} out[n];
-
-    out <== in;
-}
 
 /*
 *** MaxbitCheck(n): template that adds the constraints needed to ensure that a signal can be expressed using n bits(that is, that is value is in [0, 2**n)) and adds the tag maxbit = n to the input
@@ -150,46 +113,6 @@ template MaxbitCheckArray(n,m) {
        out[i] <== MaxbitCheck(n)(in[i]);
     }
     
-}
-
-/*
-*** ForceMaxbitTag(n): template that adds the tag maxbit = n to the input without adding any constraints to ensure that the input especification of the tag
-        - Inputs: in -> field value
-        - Output: out -> same value as in, but including maxbit tag with out.maxbit = n
-                         DOES NOT CHECK THAT out satisfies tag out.maxbit = n
-         
-    Note: the template does not check if the input actually satisfies the maxbit specification --> Use carefully, potentially dangerous template
-          For instance, ForceMaxbitTag(2)(10) = 10, including tag maxbit = 2
-          
-*/
-
-
-template ForceMaxbit(n) {
-    signal input in;
-    signal output {maxbit} out;
-
-    out.maxbit = n;
-    in ==> out;
-}
-
-/*
-*** ForceMaxbitArrayTag(n, m): template that adds the tag maxbit = n to the input that is an array of m signals without adding any constraints to ensure that the inputs especification of the tag
-        - Inputs: in[m] -> field value
-        - Output: out[m] -> same value as in, but including maxbit tag with out.maxbit = n
-                         DOES NOT CHECK THAT out satisfies tag out.maxbit = n
-         
-    Note: the template does not check if the input actually satisfies the maxbit specification --> Use carefully, potentially dangerous template
-          For instance, ForceMaxbitTag(2,2)([0,10]) = [0,10], including tag maxbit = 2
-          
-*/
-
-template ForceMaxbitArray(n,m) {
-    signal input in[m];
-    signal output {maxbit} out[m];
-
-    out.maxbit = n;
-    
-    in ==> out;
 }
 
 
@@ -249,5 +172,6 @@ template AddMaxAbsValueTag(n){
     out.max_abs = n;
     out <== in;
 }
+
 
 
