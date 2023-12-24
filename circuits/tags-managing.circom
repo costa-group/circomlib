@@ -117,49 +117,32 @@ template MaxbitCheckArray(n,m) {
 
 
 /*
-*** MaxValueCheck(n): template that adds the constraints needed to ensure that a signal is smaller or equal than a given value n and adds the tag max = n to the input
+*** MaxValueCheck(ct): template that adds the constraints needed to ensure that a signal is smaller or equal than a given value ct and adds the tag maxvalue = ct to the input
         - Inputs: in -> field value
-        - Output: out -> same value as in, but including max tag with out.max = n
-                         satisfies tag out.max = n
+        - Output: out -> same value as in, but including max tag with out.maxvalue = ct
+                         satisfies tag out.maxvalue = ct
          
     Example: MaxValueCheck(15)(14) = 14 and can be satisfied
-    Note: in case the input in does not satisfy the specification of max then the generated system of constraints does not have any solution for that input. 
+    Note: in case the input in does not satisfy the specification of maxvalue then the generated system of constraints does not have any solution for that input. 
           For instance, MaxValueCheck(3)(100) -> no solution
           
 */
 
-template MaxValueCheck(n) {
-    signal input in;
-    signal output {max} out;
-    
-    signal {maxbit} aux[2];
-    aux.maxbit = nbits(n);
-    aux[0] <== MaxbitCheck(nbits(n))(in); // to ensure the correct size
-    aux[1] <== n;
-
-    signal out1 <== LessEqThan(n)(aux);
-    out1 === 1;
-    out.max = n;
-    out <== in;
-}
-
-
-/*
-*** MaxValueCheck(ct): template that receives an input, checks its value is smaller than or equal to the constant value ct given as a parameter, and returns the same input but with the tag maxvalue with value ct 
-        - Inputs: in -> field number
-        - Outputs: out -> field number 
-                          satisfies tag maxvalue with value ct
-*/
-
-template MaxValueCheck2(ct){
+template MaxValueCheck(ct) {
     signal input in;
     signal output {maxvalue} out;
+    
+    signal {maxbit} aux[2];
+    aux.maxbit = nbits(ct);
+    aux[0] <== MaxbitCheck(nbits(ct))(in); // to ensure the correct size
+    aux[1] <== n;
 
-    signal res <== CompConstant(ct)(Num2Bits(254)(in));
-    res === 0;
-    out.maxvalue = ct;
+    signal out1 <== LessEqThan(nbits(ct))(aux);
+    out1 === 1;
+    out.maxvalue = n;
     out <== in;
 }
+
 
 /*
 *** MinValueCheck(ct): template that receives an input, checks its value is greater than or equal to the constant value ct given as a parameter, and returns the same input but with the tag minvalue with value ct 
@@ -188,15 +171,28 @@ template MinValueCheck(ct){
 
 template MinMaxValueCheck(ct1,ct2){
     signal input in;
-    signal output {minvalue,maxvalue} out;
+    signal output {minvalue, maxvalue} out;
     
-    signal inb[254] <== Num2Bits(254)(in);
-    signal res1 <== CompConstant(ct1-1)(inb);
-    res1 === 1;
-    out.minvalue = ct1;
-    signal res2 <== CompConstant(ct2)(inb);
-    res2 === 0;    
-    out.maxvalue = ct2;
+    assert(0 <= ct1 && ct1 <= ct2);
+    
+    signal checked_in <== MaxbitCheck(nbits(ct2))(in); // to ensure the correct size
+    
+    signal {maxbit} aux_min[2];
+    aux_min.maxbit = nbits(ct2);
+    aux_min[0] <== ct1;
+    aux_min[1] <== checked_in;
+    signal out1 <== LessEqThan(nbits(n))(aux_min);
+    out1 === 1;
+    out.minvalue = n;
+    
+    signal {maxbit} aux_max[2];
+    aux.maxbit = nbits(ct2);
+    aux_max[0] <== checked_in;
+    aux_max[1] <== ct2;
+    signal out2 <== LessEqThan(nbits(n))(aux_max);
+    out2 === 1;
+    out.maxvalue = n;
+    
     out <== in;
 }
 
@@ -204,10 +200,10 @@ template MinMaxValueCheck(ct1,ct2){
 
 
 /*
-*** AddMaxAbsValueTag(n): template that adds the constraints needed to ensure that the absolute value of a signal is smaller or equal than a given value n and adds the tag max_abs = n to the input
+*** AddMaxAbsValueTag(ct): template that adds the constraints needed to ensure that the absolute value of a signal is smaller or equal than a given value ct and adds the tag max_abs = ct to the input
         - Inputs: in -> field value
-        - Output: out -> same value as in, but including max_abs tag with out.max_abs = n
-                         satisfies tag out.max_abs = n
+        - Output: out -> same value as in, but including max_abs tag with out.max_abs = ct
+                         satisfies tag out.max_abs = ct
          
     Example: AddMaxValueTag(15)(-14) = 14 and can be satisfied
     Note: in case the input in does not satisfy the specification of max_abs then the generated system of constraints does not have any solution for that input. 
@@ -215,21 +211,21 @@ template MinMaxValueCheck(ct1,ct2){
           
 */
 
-template AddMaxAbsValueTag(n){
+template AddMaxAbsValueTag(ct){
     signal input in;
-    signal output {max_abs} out;
+    signal output {maxabsvalue} out;
     
-    var needed_bits = nbits(2 * n);
+    var needed_bits = nbits(2 * ct);
     
     signal {maxbit} aux[2];
     aux.maxbit = needed_bits;
-    aux[0] <== MaxbitCheck(needed_bits)(in + n); // to ensure that 0 <= aux[0] < 2**nbits(2 * n)
-    aux[1] <== 2 * n;
+    aux[0] <== MaxbitCheck(needed_bits)(in + ct); // to ensure that 0 <= aux[0] < 2**nbits(2 * ct)
+    aux[1] <== 2 * ct;
 
-    signal out1 <== LessEqThan(n)(aux); // checks that 0 <= in + n <= 2 * n <==> -n <= in <= n
+    signal out1 <== LessEqThan(needed_bits)(aux); // checks that 0 <= in + ct <= 2 * ct <==> -ct <= in <= ct
     out1 === 1;
     
-    out.max_abs = n;
+    out.maxabsvalue = ct;
     out <== in;
 }
 
