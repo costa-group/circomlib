@@ -135,11 +135,11 @@ template MaxValueCheck(ct) {
     signal {maxbit} aux[2];
     aux.maxbit = nbits(ct);
     aux[0] <== MaxbitCheck(nbits(ct))(in); // to ensure the correct size
-    aux[1] <== n;
+    aux[1] <== ct;
 
     signal out1 <== LessEqThan(nbits(ct))(aux);
     out1 === 1;
-    out.maxvalue = n;
+    out.maxvalue = ct;
     out <== in;
 }
 
@@ -181,17 +181,17 @@ template MinMaxValueCheck(ct1,ct2){
     aux_min.maxbit = nbits(ct2);
     aux_min[0] <== ct1;
     aux_min[1] <== checked_in;
-    signal out1 <== LessEqThan(nbits(n))(aux_min);
+    signal out1 <== LessEqThan(nbits(ct1))(aux_min);
     out1 === 1;
-    out.minvalue = n;
+    out.minvalue = ct1;
     
     signal {maxbit} aux_max[2];
-    aux.maxbit = nbits(ct2);
+    aux_max.maxbit = nbits(ct2);
     aux_max[0] <== checked_in;
     aux_max[1] <== ct2;
-    signal out2 <== LessEqThan(nbits(n))(aux_max);
+    signal out2 <== LessEqThan(nbits(ct2))(aux_max);
     out2 === 1;
-    out.maxvalue = n;
+    out.maxvalue = ct2;
     
     out <== in;
 }
